@@ -1,23 +1,55 @@
 import { NextResponse } from "next/server";
-import { getServiceRoleSupabase, handleSupabaseError } from "@/lib/supabase";
+import {
+  createServerSupabaseClient,
+  getServiceRoleSupabase,
+  handleSupabaseError,
+} from "@/lib/supabase";
 import { spotifyAPI } from "@/lib/spotify";
 
-// Security: Check for authorization header
-function checkAuth(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  const expectedAuth = `Bearer ${process.env.API_SECRET_KEY}`;
+// Security: Check for authenticated admin user
+async function checkAdminAuth(request: Request) {
+  try {
+    const authHeader = request.headers.get("authorization");
 
-  if (!authHeader || authHeader !== expectedAuth) {
-    return false;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return {
+        authorized: false,
+        error: "Missing or invalid authorization header",
+      };
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    // Create server client and verify the JWT token
+    const supabase = await createServerSupabaseClient();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      return { authorized: false, error: "Invalid or expired token" };
+    }
+
+    // Check if user has admin role
+    const userRole = user.user_metadata?.role;
+    if (userRole !== "admin") {
+      return { authorized: false, error: "Insufficient privileges" };
+    }
+
+    return { authorized: true, user };
+  } catch (error) {
+    console.error("Auth check error:", error);
+    return { authorized: false, error: "Authentication failed" };
   }
-  return true;
 }
 
 export async function POST(request: Request) {
-  // Check authorization
-  if (!checkAuth(request)) {
+  // Check authentication
+  const authResult = await checkAdminAuth(request);
+  if (!authResult.authorized) {
     return NextResponse.json(
-      { success: false, error: "Unauthorized" },
+      { success: false, error: authResult.error },
       { status: 401 }
     );
   }
@@ -45,7 +77,9 @@ export async function POST(request: Request) {
     let failed = 0;
 
     console.log(
-      `Refreshing data for ${artists?.length || 0} artists with Spotify IDs...`
+      `[Admin: ${authResult.user?.email}] Refreshing data for ${
+        artists?.length || 0
+      } artists with Spotify IDs...`
     );
 
     for (const artist of artists || []) {
@@ -97,6 +131,10 @@ export async function POST(request: Request) {
         });
       }
     }
+
+    console.log(
+      `[Admin: ${authResult.user?.email}] Refresh completed: ${updated} updated, ${failed} failed`
+    );
 
     return NextResponse.json({
       success: true,

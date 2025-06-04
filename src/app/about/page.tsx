@@ -1,20 +1,15 @@
 import Link from "next/link";
+import StandardHero from "@/app/components/StandardHero";
 
 export default function AboutPage() {
   return (
     <div>
-      {/* Header Section */}
-      <section className="py-15 px-4 bg-gray-50">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-section-title font-work-sans font-bold text-gray-900 mb-4">
-            About Engeloop Records
-          </h1>
-          <p className="text-xl text-gray-500 leading-relaxed">
-            Discover the story behind our passion for Afro House and Deep House
-            music
-          </p>
-        </div>
-      </section>
+      {/* Standardized Hero Section */}
+      <StandardHero
+        title="ABOUT ENGELOOP RECORDS"
+        subtitle="Discover the story behind our passion for Afro House and Deep House music"
+        backgroundColor="gradient"
+      />
 
       {/* Content Section */}
       <section className="py-20 px-4 bg-white">

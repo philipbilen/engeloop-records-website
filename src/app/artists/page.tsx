@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ArtistCard from "@/app/components/ArtistCard";
+import StandardHero from "@/app/components/StandardHero";
 
 interface Artist {
   id: string;
@@ -65,25 +66,13 @@ export default function ArtistsPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section
-        className="relative pt-32 pb-20 bg-cover bg-center bg-fixed flex items-center justify-center"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(/media/Iniye_Cover.jpg)",
-          minHeight: "50vh",
-        }}
-      >
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto pt-16">
-          <h1 className="text-6xl font-bold text-white uppercase tracking-wider mb-8 leading-none">
-            Our Artists
-          </h1>
-          <p className="text-xl text-white/95 leading-relaxed max-w-2xl mx-auto">
-            Discover the talented artists who shape the sound of Engeloop
-            Records
-          </p>
-        </div>
-      </section>
+      {/* Standardized Hero Section */}
+      <StandardHero
+        title="OUR ARTISTS"
+        subtitle="Discover the talented artists who shape the sound of Engeloop Records"
+        backgroundImage="/media/Iniye_Cover.jpg"
+        textColor="light"
+      />
 
       {/* Artists Grid */}
       <section className="py-24 bg-white">

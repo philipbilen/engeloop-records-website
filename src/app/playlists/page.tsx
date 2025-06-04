@@ -21,6 +21,8 @@ interface PlaylistData {
   lastUpdated: string;
 }
 
+import StandardHero from "@/app/components/StandardHero";
+
 /* ---------- Component ---------- */
 export default function PlaylistsPage() {
   const [data, setData] = useState<PlaylistData | null>(null);
@@ -50,215 +52,60 @@ export default function PlaylistsPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <span className="text-xl font-semibold">Loading playlists…</span>
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-engeloop-orange mx-auto mb-4"></div>
+          <span className="text-xl font-semibold text-gray-900">
+            Loading playlists…
+          </span>
+        </div>
       </div>
     );
   }
 
   if (!data?.success) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <span className="text-xl font-semibold text-red-600">
-          Failed to load playlists
-        </span>
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <span className="text-xl font-semibold text-red-600">
+            Failed to load playlists
+          </span>
+        </div>
       </div>
     );
   }
 
   /* ---------- Page ---------- */
   return (
-    <>
-      <style jsx>{`
-        /* Generic container used across sections */
-        .page-container {
-          max-width: 1024px;
-          margin: 0 auto;
-          padding: 0 1rem;
-        }
-
-        /* Hero */
-        .hero-section {
-          padding: 7rem 1rem 4rem 1rem; /* extra top space below logo/nav */
-          background: linear-gradient(to bottom, #ffffff, #f9fafb);
-          text-align: center;
-        }
-        .main-title {
-          font: 800 3.5rem/1.1 "Poppins", sans-serif;
-          color: #111827;
-          letter-spacing: -0.01em;
-          margin-bottom: 0.75rem;
-        }
-        .subtitle {
-          font: 500 1.25rem/1.4 "Poppins", sans-serif;
-          color: #6b7280;
-          max-width: 600px;
-          margin: 0 auto 1rem;
-        }
-        .description {
-          font: 400 1.25rem/1.6 "Poppins", sans-serif;
-          color: #374151;
-          max-width: 800px;
-          margin: 0 auto;
-        }
-
-        /* Flagship */
-        .flagship-section {
-          padding: 5rem 1rem 4rem;
-          background: #f9fafb;
-        }
-        .section-title {
-          font: 700 2.5rem/1.2 "Poppins", sans-serif;
-          color: #111827;
-          margin-bottom: 1rem;
-        }
-        .follower-count {
-          font: 600 2rem/1.3 "Poppins", sans-serif;
-          color: #374151;
-        }
-        .growth-text {
-          font: 500 1.25rem/1.4 "Poppins", sans-serif;
-          color: #059669;
-          margin-bottom: 2rem;
-        }
-        .hero-playlist-embed {
-          background: #fff;
-          border: 1px solid #e5e7eb;
-          border-radius: 16px;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-          padding: 2.5rem;
-          margin: 0 auto;
-        }
-        .hero-spotify-embed {
-          width: 100%;
-          height: 500px;
-          border: none;
-          border-radius: 12px;
-        }
-
-        /* Supporting grid */
-        .supporting-section {
-          padding: 3rem 1rem;
-        }
-        .supporting-intro {
-          text-align: center;
-          margin-bottom: 3rem;
-        }
-        .playlist-grid {
-          display: grid;
-          gap: 2rem;
-          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        }
-        .playlist-embed-card {
-          background: #fff;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-          transition: box-shadow 0.2s, border 0.2s;
-        }
-        .playlist-embed-card:hover {
-          border-color: #c04e27;
-          box-shadow: 0 16px 30px rgba(0, 0, 0, 0.08);
-        }
-        .playlist-header {
-          padding: 1.5rem;
-          text-align: center;
-        }
-        .playlist-name {
-          font: 700 1.25rem/1.3 "Poppins", sans-serif;
-          color: #111827;
-          margin-bottom: 0.5rem;
-        }
-        .playlist-followers {
-          font: 600 1.125rem/1.4 "Poppins", sans-serif;
-          color: #374151;
-          margin-bottom: 0.5rem;
-        }
-        .playlist-tracks {
-          font: 400 0.875rem/1.4 "Poppins", sans-serif;
-          color: #9ca3af;
-        }
-        .spotify-embed {
-          width: 100%;
-          height: 380px;
-          border: none;
-          border-radius: 0 0 12px 12px;
-        }
-
-        /* CTA */
-        .cta-section {
-          padding: 6rem 1rem;
-          background: #111827;
-          color: #fff;
-          text-align: center;
-        }
-        .cta-title {
-          font: 700 2.5rem/1.2 "Poppins", sans-serif;
-          margin-bottom: 1rem;
-        }
-        .cta-description {
-          font: 400 1.25rem/1.5 "Poppins", sans-serif;
-          color: #d1d5db;
-          margin-bottom: 2rem;
-        }
-        .cta-button {
-          background: #fff;
-          color: #111827;
-          padding: 1rem 2rem;
-          border-radius: 8px;
-          font: 700 1.125rem/1 "Poppins", sans-serif;
-          text-decoration: none;
-          transition: background 0.2s;
-        }
-        .cta-button:hover {
-          background: #f3f4f6;
-        }
-
-        /* Responsive tweaks */
-        @media (max-width: 768px) {
-          .main-title {
-            font-size: 2.5rem;
-          }
-          .playlist-grid {
-            grid-template-columns: 1fr;
-          }
-          .hero-spotify-embed {
-            height: 400px;
-          }
-          .spotify-embed {
-            height: 320px;
-          }
-        }
-      `}</style>
-
-      {/* ------------ Hero ------------ */}
-      <section className="hero-section">
-        <div className="page-container">
-          <h1 className="main-title">OUR PLAYLISTS</h1>
-          <p className="subtitle">
-            {data.totalFollowers.toLocaleString()}+ followers across{" "}
-            {data.playlistCount} curated playlists
-          </p>
-          <p className="description">
-            Your music reaches engaged audiences through our carefully curated
-            playlist network. Every release gets featured on our flagship
-            playlist with 113K+ active followers.
-          </p>
-        </div>
-      </section>
+    <div className="min-h-screen bg-white">
+      {/* Standardized Hero */}
+      <StandardHero
+        title="OUR PLAYLISTS"
+        subtitle={`${data.totalFollowers.toLocaleString()}+ followers across ${
+          data.playlistCount
+        } curated playlists`}
+        description="Your music reaches engaged audiences through our carefully curated playlist network. Every release gets featured on our flagship playlist with 113K+ active followers."
+        backgroundColor="gradient"
+      />
 
       {/* ------------ Flagship ------------ */}
-      <section className="flagship-section">
-        <div className="page-container">
-          <h2 className="section-title">FLAGSHIP PLAYLIST</h2>
-          <div className="follower-count">
-            {data.hero.followers.toLocaleString()} Followers
+      <section className="py-20 px-4 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-section-title font-work-sans font-bold text-gray-900 mb-4">
+              FLAGSHIP PLAYLIST
+            </h2>
+            <div className="text-4xl font-work-sans font-bold text-gray-900 mb-2">
+              {data.hero.followers.toLocaleString()} Followers
+            </div>
+            <div className="text-xl font-inter font-semibold text-green-600 mb-8">
+              Growing +660 daily
+            </div>
           </div>
-          <div className="growth-text">Growing +660 daily</div>
 
-          <div className="hero-playlist-embed">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 max-w-4xl mx-auto">
             <iframe
-              className="hero-spotify-embed"
+              className="w-full h-96 md:h-[500px] rounded-xl"
               src={getSpotifyEmbedUrl(data.hero.spotifyUrl)}
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy"
@@ -268,31 +115,42 @@ export default function PlaylistsPage() {
       </section>
 
       {/* ------------ Supporting ------------ */}
-      <section className="supporting-section">
-        <div className="page-container">
-          <div className="supporting-intro">
-            <h2 className="section-title">SPECIALIZED PLAYLISTS</h2>
-            <p className="subtitle" style={{ marginBottom: 0 }}>
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-section-title font-work-sans font-bold text-gray-900 mb-4">
+              SPECIALIZED PLAYLISTS
+            </h2>
+            <p className="text-xl font-inter text-gray-600 max-w-2xl mx-auto">
               Diverse audiences across multiple genres and moods
             </p>
           </div>
 
-          <div className="playlist-grid">
-            {data.supporting.map((p, i) => (
-              <div key={i} className="playlist-embed-card">
-                <div className="playlist-header">
-                  <h3 className="playlist-name">{p.name}</h3>
-                  <div className="playlist-followers">
-                    {p.followers.toLocaleString()} followers
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {data.supporting.map((playlist, index) => (
+              <div
+                key={index}
+                className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg hover:border-engeloop-orange transition-all duration-300"
+              >
+                <div className="p-6 text-center border-b border-gray-100">
+                  <h3 className="text-xl font-work-sans font-bold text-gray-900 mb-2">
+                    {playlist.name}
+                  </h3>
+                  <div className="text-lg font-inter font-semibold text-gray-700 mb-1">
+                    {playlist.followers.toLocaleString()} followers
                   </div>
-                  <div className="playlist-tracks">{p.trackCount} tracks</div>
+                  <div className="text-sm font-inter text-gray-500">
+                    {playlist.trackCount} tracks
+                  </div>
                 </div>
-                <iframe
-                  className="spotify-embed"
-                  src={getSpotifyEmbedUrl(p.spotifyUrl)}
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
-                />
+                <div className="p-0">
+                  <iframe
+                    className="w-full h-80 rounded-b-xl"
+                    src={getSpotifyEmbedUrl(playlist.spotifyUrl)}
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -300,18 +158,23 @@ export default function PlaylistsPage() {
       </section>
 
       {/* ------------ CTA ------------ */}
-      <section className="cta-section">
-        <div className="page-container">
-          <h2 className="cta-title">Ready to Reach These Audiences?</h2>
-          <p className="cta-description">
+      <section className="py-24 px-4 bg-gray-900 text-white text-center">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-work-sans font-bold mb-6">
+            Ready to Reach These Audiences?
+          </h2>
+          <p className="text-xl font-inter text-gray-300 mb-8 max-w-2xl mx-auto">
             Submit your demo and get featured across our{" "}
             {data.totalFollowers.toLocaleString()}+ follower network
           </p>
-          <a href="/submit" className="cta-button">
+          <a
+            href="/submit"
+            className="inline-block bg-engeloop-orange hover:bg-engeloop-orange/90 text-white font-work-sans font-bold text-lg px-8 py-4 rounded-xl transition-all duration-200 hover:-translate-y-1 hover:shadow-lg no-underline"
+          >
             Submit Demo
           </a>
         </div>
       </section>
-    </>
+    </div>
   );
 }

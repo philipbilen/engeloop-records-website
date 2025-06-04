@@ -45,7 +45,8 @@ export default function ArtistCard({ artist }: { artist: Artist }) {
             src={artist.image_url}
             alt={artist.artist_name}
             fill
-            className="object-cover"
+            sizes="320px"
+            style={{ objectFit: "cover" }}
             onError={() => setImageError(true)}
           />
         ) : (

@@ -17,44 +17,84 @@ const Navigation = () => {
     { href: "/about", label: "About" },
     { href: "/artists", label: "Artists" },
     { href: "/contact", label: "Contact" },
-    { href: "/admin", label: "Admin" },
-    { href: "/playlists", label: "Playlists" },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-8 py-4 backdrop-blur-md bg-black/20">
-      <div className="relative flex justify-between items-center">
+    <nav
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        padding: "1rem 2rem",
+        backdropFilter: "blur(10px)",
+        backgroundColor: "rgba(0, 0, 0, 0.2)",
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         {/* Left: Nav Links */}
-        <div className="hidden md:flex gap-6">
+        <div style={{ display: "flex", gap: "1.5rem" }}>
           {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-inter font-medium text-sm uppercase tracking-widest text-white no-underline transition-colors duration-200 hover:text-engeloop-cream"
-            >
+            <Link key={link.href} href={link.href} className="nav-link">
               {link.label}
             </Link>
           ))}
         </div>
 
-        {/* Center: Oversized Logo */}
-        <div className="absolute left-1/2 top-[-25px] -translate-x-1/2 z-60">
+        {/* Center: Logo */}
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "-25px",
+            transform: "translateX(-50%)",
+            zIndex: 60,
+          }}
+        >
           <Link href="/">
             <Image
               src="/media/engeloop-logo.png"
-              alt="Engeloop Logo"
+              alt="Engeloop Records Logo"
               width={160}
               height={160}
-              className="block pointer-events-none"
+              priority
+              sizes="160px"
+              style={{
+                display: "block",
+                pointerEvents: "none",
+              }}
             />
           </Link>
         </div>
 
-        {/* Right: Submit Button + Mobile Menu Toggle */}
-        <div className="flex items-center gap-4">
+        {/* Right: Submit + Mobile Menu Toggle */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <Link
             href="/submit"
-            className="px-4 py-2 bg-white text-black rounded-md font-semibold text-sm no-underline transition-all duration-200 hover:bg-gray-200"
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#fff",
+              color: "#000",
+              borderRadius: "6px",
+              fontWeight: 600,
+              fontSize: "0.875rem",
+              textDecoration: "none",
+              transition: "all 0.2s ease-in-out",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#eee";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#fff";
+            }}
           >
             Submit Your Demo
           </Link>
@@ -62,7 +102,13 @@ const Navigation = () => {
           {/* Mobile Menu Icon */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden bg-transparent border-none text-white cursor-pointer"
+            style={{
+              background: "none",
+              border: "none",
+              color: "#fff",
+              cursor: "pointer",
+              display: "none", // Show via media query if needed
+            }}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -71,13 +117,29 @@ const Navigation = () => {
 
       {/* Mobile Nav Overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/95 flex flex-col justify-center items-center gap-8 z-[999] md:hidden">
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100vh",
+            background: "rgba(0, 0, 0, 0.95)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "2rem",
+            zIndex: 999,
+          }}
+        >
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="font-inter font-medium text-xl text-white no-underline transition-colors duration-200 hover:text-engeloop-cream"
+              className="nav-link"
+              style={{ fontSize: "1.25rem", color: "#fff" }}
             >
               {link.label}
             </Link>

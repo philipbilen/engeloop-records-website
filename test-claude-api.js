@@ -1,6 +1,6 @@
 // test-claude-api.js
 const API_BASE = "http://localhost:3000/api/claude";
-const API_KEY = "engeloop_secure_key_2025_xyz789abc123def456ghi"; // Replace with your actual key
+const API_KEY = "9BJsFLu7GCXUZ/IHhfzZgrvIuvuYS7BwwJgWO8VkqVM="; // Replace with your actual key
 
 async function testClaudeAPI() {
   console.log("🧪 Testing Claude API Integration...\n");

@@ -1,3 +1,4 @@
 {
-  "/login/page": "app/login/page.js"
+  "/api/claude/artists/route": "app/api/claude/artists/route.js",
+  "/api/claude/submissions/route": "app/api/claude/submissions/route.js"
 }

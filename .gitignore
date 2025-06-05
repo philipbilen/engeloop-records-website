@@ -4,3 +4,4 @@ dist
 .cache
 .env.local
 /public
+.env.local

@@ -11,15 +11,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
-    "/artists/page": [
+    "/submit/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/artists/page.js"
-    ],
-    "/api/artists/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/artists/route.js"
+      "static/chunks/app/submit/page.js"
     ]
   }
 }

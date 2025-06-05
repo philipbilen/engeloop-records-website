@@ -28,7 +28,7 @@ const Navigation = () => {
         right: 0,
         zIndex: 50,
         padding: "1rem 2rem",
-        backdropFilter: "blur(10px)",
+        backdropFilter: "blur(1px)",
         backgroundColor: "rgba(0, 0, 0, 0.2)",
       }}
     >
@@ -63,8 +63,8 @@ const Navigation = () => {
             <Image
               src="/media/engeloop-logo.png"
               alt="Engeloop Records Logo"
-              width={160}
-              height={160}
+              width={120}
+              height={120}
               priority
               sizes="160px"
               style={{
@@ -96,7 +96,7 @@ const Navigation = () => {
               e.currentTarget.style.backgroundColor = "#fff";
             }}
           >
-            Submit Your Demo
+            DROP A DEMO
           </Link>
 
           {/* Mobile Menu Icon */}

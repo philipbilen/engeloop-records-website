@@ -38,8 +38,8 @@ export default function ArtistCard({ artist }: { artist: Artist }) {
   ].filter((link) => link.url);
 
   return (
-    <div className="bg-white rounded-3xl shadow-lg overflow-hidden max-w-80 w-full transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl">
-      <div className="h-80 relative bg-gray-100">
+    <div className="bg-white shadow-lg rounded overflow-hidden max-w-80 w-full transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl">
+      <div className="h-[20rem] sm:h-[22rem] relative bg-gray-100">
         {artist.image_url && !imageError ? (
           <Image
             src={artist.image_url}
@@ -66,7 +66,7 @@ export default function ArtistCard({ artist }: { artist: Artist }) {
           </h3>
         </div>
       </div>
-      <div className="p-8 flex justify-center gap-5 min-h-20">
+      <div className="p-6 bg-engeloop-orange flex justify-center gap-5 min-h-20">
         {socialLinks.length > 0 ? (
           socialLinks.map(({ icon: Icon, color, url, name }) => (
             <a
@@ -81,7 +81,7 @@ export default function ArtistCard({ artist }: { artist: Artist }) {
             </a>
           ))
         ) : (
-          <div className="text-gray-400 text-sm italic flex items-center h-14">
+          <div className="flex items-center justify-center h-14 text-gray-400 text-sm italic">
             Coming soon...
           </div>
         )}

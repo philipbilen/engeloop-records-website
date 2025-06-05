@@ -1,279 +1,158 @@
+// src/app/api/submit-demo/route.ts
+
 import { NextResponse } from "next/server";
-import { getServiceRoleSupabase, handleSupabaseError } from "@/lib/supabase";
-
-// Validation schema for demo submission
-interface DemoSubmissionData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  artistName: string;
-  trackTitle: string;
-  genres: string[];
-  instagramHandle?: string;
-  spotifyProfileUrl?: string;
-  additionalInfo?: string;
-  bpm?: number;
-}
-
-// Input validation function
-function validateDemoSubmission(data: unknown): {
-  isValid: boolean;
-  errors: string[];
-  sanitized?: DemoSubmissionData;
-} {
-  const errors: string[] = [];
-
-  // Type guard to ensure data is an object
-  if (!data || typeof data !== "object") {
-    return { isValid: false, errors: ["Invalid request data"] };
-  }
-
-  const input = data as Record<string, unknown>;
-
-  // Required fields validation
-  if (
-    !input.firstName ||
-    typeof input.firstName !== "string" ||
-    input.firstName.trim().length < 1
-  ) {
-    errors.push("First name is required");
-  }
-
-  if (
-    !input.lastName ||
-    typeof input.lastName !== "string" ||
-    input.lastName.trim().length < 1
-  ) {
-    errors.push("Last name is required");
-  }
-
-  if (!input.email || typeof input.email !== "string") {
-    errors.push("Email is required");
-  } else {
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(input.email)) {
-      errors.push("Please provide a valid email address");
-    }
-  }
-
-  if (
-    !input.artistName ||
-    typeof input.artistName !== "string" ||
-    input.artistName.trim().length < 1
-  ) {
-    errors.push("Artist name is required");
-  }
-
-  if (
-    !input.trackTitle ||
-    typeof input.trackTitle !== "string" ||
-    input.trackTitle.trim().length < 1
-  ) {
-    errors.push("Track title is required");
-  }
-
-  if (
-    !input.genres ||
-    !Array.isArray(input.genres) ||
-    input.genres.length === 0
-  ) {
-    errors.push("At least one genre must be selected");
-  }
-
-  // Optional fields validation
-  if (input.instagramHandle && typeof input.instagramHandle === "string") {
-    // Remove @ symbol if present and validate
-    const handle = input.instagramHandle.replace(/^@/, "").trim();
-    if (handle.length > 0 && !/^[a-zA-Z0-9._]+$/.test(handle)) {
-      errors.push("Instagram handle contains invalid characters");
-    }
-  }
-
-  if (input.spotifyProfileUrl && typeof input.spotifyProfileUrl === "string") {
-    if (!input.spotifyProfileUrl.includes("spotify.com")) {
-      errors.push("Please provide a valid Spotify URL");
-    }
-  }
-
-  if (
-    input.bpm &&
-    (typeof input.bpm !== "number" || input.bpm < 60 || input.bpm > 200)
-  ) {
-    errors.push("BPM must be a number between 60 and 200");
-  }
-
-  if (errors.length > 0) {
-    return { isValid: false, errors };
-  }
-
-  // Return sanitized data
-  const sanitized: DemoSubmissionData = {
-    firstName: input.firstName as string,
-    lastName: input.lastName as string,
-    email: (input.email as string).toLowerCase().trim(),
-    artistName: (input.artistName as string).trim(),
-    trackTitle: (input.trackTitle as string).trim(),
-    genres: (input.genres as string[]).filter(
-      (g: unknown) => typeof g === "string" && g.length > 0
-    ),
-    instagramHandle: input.instagramHandle
-      ? (input.instagramHandle as string).replace(/^@/, "").trim() || undefined
-      : undefined,
-    spotifyProfileUrl: input.spotifyProfileUrl
-      ? (input.spotifyProfileUrl as string).trim() || undefined
-      : undefined,
-    additionalInfo: input.additionalInfo
-      ? (input.additionalInfo as string).trim() || undefined
-      : undefined,
-    bpm: (input.bpm as number) || undefined,
-  };
-
-  return { isValid: true, errors: [], sanitized };
-}
-
-// Rate limiting check (simple in-memory store - in production, use Redis)
-const submissionAttempts = new Map<
-  string,
-  { count: number; lastAttempt: number }
->();
-
-function checkRateLimit(email: string): { allowed: boolean; message?: string } {
-  const now = Date.now();
-  const key = email.toLowerCase();
-  const attempt = submissionAttempts.get(key);
-
-  // Reset counter if more than 1 hour has passed
-  if (!attempt || now - attempt.lastAttempt > 3600000) {
-    submissionAttempts.set(key, { count: 1, lastAttempt: now });
-    return { allowed: true };
-  }
-
-  // Allow up to 3 submissions per hour
-  if (attempt.count >= 3) {
-    return {
-      allowed: false,
-      message:
-        "Too many submissions. Please wait an hour before submitting again.",
-    };
-  }
-
-  // Update attempt count
-  submissionAttempts.set(key, { count: attempt.count + 1, lastAttempt: now });
-  return { allowed: true };
-}
+import { getServiceRoleSupabase } from "@/lib/supabase";
+import { validateData, DemoSubmissionSchema } from "@/lib/validation";
+import { checkDemoSubmissionLimit } from "@/lib/rateLimiting";
+import { logger } from "@/lib/logger";
+import { withErrorHandling, ErrorFactory } from "@/lib/errorHandling";
+import { createErrorResponse, createSuccessResponse } from "@/lib/apiUtils";
 
 export async function POST(request: Request) {
-  console.log("🔥 Demo submission API called");
+  logger.api("POST", "/api/submit-demo", 200, { started: true });
 
-  try {
-    // Parse request body
-    const body = await request.json();
-    console.log("📝 Request body:", body);
+  return withErrorHandling(
+    async () => {
+      // Parse request body
+      const body = await request.json().catch(() => {
+        throw ErrorFactory.validation(
+          "Invalid JSON in request body",
+          "Invalid request format. Please try again."
+        );
+      });
 
-    // Validate input data
-    const validation = validateDemoSubmission(body);
-    if (!validation.isValid) {
-      console.log("❌ Validation failed:", validation.errors);
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Validation failed",
-          details: validation.errors,
-        },
-        { status: 400 }
-      );
-    }
+      logger.submission("Demo submission received", {
+        hasArtistName: !!body.artistName,
+        hasTrackTitle: !!body.trackTitle,
+        hasEmail: !!body.email,
+      });
 
-    const data = validation.sanitized!;
-    console.log("✅ Data validated:", data);
+      // Validate input data using Zod
+      const validation = validateData(DemoSubmissionSchema, body);
+      if (!validation.success) {
+        logger.submission("Validation failed", { errors: validation.errors });
+        return createErrorResponse("Validation failed", 400, validation.errors);
+      }
 
-    // Check rate limiting
-    const rateLimitCheck = checkRateLimit(data.email);
-    if (!rateLimitCheck.allowed) {
-      console.log("🚫 Rate limit exceeded for:", data.email);
-      return NextResponse.json(
-        {
-          success: false,
-          error: rateLimitCheck.message,
-        },
-        { status: 429 }
-      );
-    }
+      const data = validation.data;
+      logger.submission("Data validated successfully", {
+        artistName: data.artistName,
+        email: data.email,
+        genreCount: data.genres.length,
+      });
 
-    // Insert into database using service role
-    console.log("💾 Attempting database insert...");
-    const supabase = getServiceRoleSupabase();
+      // Check rate limiting
+      const rateLimitResult = await checkDemoSubmissionLimit(data.email, {
+        artistName: data.artistName,
+        trackTitle: data.trackTitle,
+      });
 
-    const { data: insertResult, error } = await supabase
-      .from("demo_submissions")
-      .insert([
-        {
-          first_name: data.firstName,
-          last_name: data.lastName,
+      if (!rateLimitResult.allowed) {
+        logger.submission("Rate limit exceeded", {
           email: data.email,
-          artist_name: data.artistName,
-          track_title: data.trackTitle,
-          genres: data.genres,
-          instagram_handle: data.instagramHandle,
-          spotify_profile_url: data.spotifyProfileUrl,
-          additional_info: data.additionalInfo,
-          bpm: data.bpm,
-          submission_status: "pending",
-          submitted_at: new Date().toISOString(),
-        },
-      ])
-      .select("id")
-      .single();
+          remainingAttempts: rateLimitResult.remainingAttempts,
+          resetTime: rateLimitResult.resetTime,
+        });
 
-    if (error) {
-      console.error("💥 Database error:", error);
-      const { error: errorMsg, status } = handleSupabaseError(
-        error,
-        "demo submission insert"
-      );
-
-      // Handle duplicate submissions
-      if (error.code === "23505") {
         return NextResponse.json(
           {
             success: false,
-            error:
-              "A submission with this email and track title already exists",
+            error: rateLimitResult.message,
+            retryAfter: Math.ceil(
+              (rateLimitResult.resetTime.getTime() - Date.now()) / 1000
+            ),
           },
-          { status: 409 }
+          {
+            status: 429,
+            headers: {
+              "Retry-After": Math.ceil(
+                (rateLimitResult.resetTime.getTime() - Date.now()) / 1000
+              ).toString(),
+            },
+          }
         );
       }
 
-      return NextResponse.json({ success: false, error: errorMsg }, { status });
-    }
+      // Insert into database
+      logger.submission("Attempting database insert", { email: data.email });
+      const supabase = getServiceRoleSupabase();
 
-    // Log successful submission (for admin monitoring)
-    console.log(
-      `✅ New demo submission: ${data.artistName} - "${data.trackTitle}" (ID: ${insertResult.id})`
-    );
+      const { data: insertResult, error } = await supabase
+        .from("demo_submissions")
+        .insert([
+          {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            email: data.email,
+            artist_name: data.artistName,
+            track_title: data.trackTitle,
+            genres: data.genres,
+            instagram_handle: data.instagramHandle,
+            spotify_profile_url: data.spotifyProfileUrl,
+            additional_info: data.additionalInfo,
+            bpm: data.bpm,
+            submission_status: "pending",
+            submitted_at: new Date().toISOString(),
+          },
+        ])
+        .select("id")
+        .single();
 
-    // Return success response
-    return NextResponse.json({
-      success: true,
-      message:
-        "Demo submitted successfully! We'll review it and get back to you within 7-14 business days.",
-      submissionId: insertResult.id,
-    });
-  } catch (error: unknown) {
-    console.error("💥 Demo submission API error:", error);
+      if (error) {
+        logger.error("Database insert failed", error, {
+          artistName: data.artistName,
+          email: data.email,
+          errorCode: error.code,
+        });
 
-    // Handle JSON parsing errors
-    if (error instanceof SyntaxError) {
-      return NextResponse.json(
-        { success: false, error: "Invalid request format" },
-        { status: 400 }
+        // Handle duplicate submissions
+        if (error.code === "23505") {
+          return createErrorResponse(
+            "A submission with this email and track title already exists",
+            409
+          );
+        }
+
+        throw ErrorFactory.database(
+          `Database insert failed: ${error.message}`,
+          "Failed to submit demo. Please try again.",
+          error,
+          { errorCode: error.code }
+        );
+      }
+
+      // Log successful submission
+      logger.submission("Demo submission successful", {
+        submissionId: insertResult.id,
+        artistName: data.artistName,
+        email: data.email,
+        trackTitle: data.trackTitle,
+        genres: data.genres,
+      });
+
+      // Return success response
+      return createSuccessResponse(
+        { submissionId: insertResult.id },
+        "Demo submitted successfully! We'll review it and get back to you within 7-14 business days."
+      );
+    },
+    { operation: "demo_submission" }
+  ).then((result) => {
+    if (result.error) {
+      logger.api("POST", "/api/submit-demo", result.error.statusCode || 500, {
+        errorType: result.error.type,
+        completed: true,
+      });
+      return createErrorResponse(
+        result.error.userMessage,
+        result.error.statusCode || 500,
+        process.env.NODE_ENV === "development"
+          ? result.error.message
+          : undefined
       );
     }
 
-    return NextResponse.json(
-      { success: false, error: "Failed to submit demo" },
-      { status: 500 }
-    );
-  }
+    logger.api("POST", "/api/submit-demo", 200, { completed: true });
+    return result.data!;
+  });
 }

@@ -1,9 +1,20 @@
+// src/app/artists/page.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ArtistCard from "@/app/components/ArtistCard";
 import StandardHero from "@/app/components/StandardHero";
+import ErrorDisplay, {
+  LoadingState,
+  EmptyState,
+} from "@/app/components/ErrorDisplay";
+import {
+  withErrorHandling,
+  normalizeError,
+  AppError,
+} from "@/lib/errorHandling";
 
 interface Artist {
   id: string;
@@ -17,53 +28,136 @@ interface Artist {
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<Artist[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+
+  const fetchArtists = async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true);
+    }
+    setError(null);
+
+    const result = await withErrorHandling(
+      async () => {
+        const response = await fetch("/api/artists");
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error("Artists endpoint not found");
+          }
+          if (response.status >= 500) {
+            throw new Error("Server error while fetching artists");
+          }
+          throw new Error(`HTTP ${response.status}: Failed to fetch artists`);
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid response format from artists API");
+        }
+
+        return data;
+      },
+      {
+        operation: "fetch_artists",
+        retryAttempt: retryCount,
+      }
+    );
+
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setArtists(result.data || []);
+    }
+
+    setLoading(false);
+  };
+
+  const handleRetry = () => {
+    setRetryCount((prev) => prev + 1);
+    fetchArtists();
+  };
 
   useEffect(() => {
-    async function fetchArtists() {
-      try {
-        const response = await fetch("/api/artists");
-        if (!response.ok) {
-          throw new Error("Failed to fetch artists");
-        }
-        const data = await response.json();
-        setArtists(data || []);
-      } catch {
-        setError("Failed to load artists");
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchArtists();
   }, []);
 
+  // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading artists...</p>
-        </div>
+      <div className="min-h-screen">
+        <StandardHero
+          title="OUR ARTISTS"
+          subtitle="Discover the talented artists who shape the sound of Engeloop Records"
+          backgroundImage="/media/Iniye_Cover.jpg"
+          textColor="light"
+        />
+        <section className="py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6">
+            <LoadingState
+              message="Loading artists..."
+              size="large"
+              className="py-16"
+            />
+          </div>
+        </section>
       </div>
     );
   }
 
+  // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4 text-lg">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium"
-          >
-            Try Again
-          </button>
-        </div>
+      <div className="min-h-screen">
+        <StandardHero
+          title="OUR ARTISTS"
+          subtitle="Discover the talented artists who shape the sound of Engeloop Records"
+          backgroundImage="/media/Iniye_Cover.jpg"
+          textColor="light"
+        />
+        <section className="py-24 bg-white">
+          <div className="max-w-4xl mx-auto px-6">
+            <ErrorDisplay
+              error={error}
+              onRetry={handleRetry}
+              showRetry={true}
+              showDetails={process.env.NODE_ENV === "development"}
+            />
+          </div>
+        </section>
       </div>
     );
   }
 
+  // Empty state
+  if (artists.length === 0) {
+    return (
+      <div className="min-h-screen">
+        <StandardHero
+          title="OUR ARTISTS"
+          subtitle="Discover the talented artists who shape the sound of Engeloop Records"
+          backgroundImage="/media/Iniye_Cover.jpg"
+          textColor="light"
+        />
+        <section className="py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6">
+            <EmptyState
+              title="No Artists Found"
+              description="We're currently building our roster. Check back soon for amazing artists!"
+              icon="🎵"
+              action={{
+                label: "Submit Your Music",
+                href: "/submit",
+              }}
+            />
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // Success state
   return (
     <div className="min-h-screen">
       {/* Standardized Hero Section */}
@@ -75,19 +169,33 @@ export default function ArtistsPage() {
       />
 
       {/* Artists Grid */}
+
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          {artists.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-xl text-gray-500">No artists found.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 justify-items-center">
-              {artists.map((artist) => (
-                <ArtistCard key={artist.id} artist={artist} />
-              ))}
+          {/* Refresh Button for Development */}
+          {process.env.NODE_ENV === "development" && (
+            <div className="mb-6 text-center">
+              {/* <button
+                onClick={() => fetchArtists(false)}
+                className="text-sm text-gray-600 hover:text-gray-800 underline"
+              >
+                🔄 Refresh Artists
+              </button> */}
             </div>
           )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 justify-items-center px-4 sm:px-6">
+            {artists.map((artist) => (
+              <ArtistCard key={artist.id} artist={artist} />
+            ))}
+          </div>
+
+          {/* Artists count */}
+          <div className="text-center mt-12 text-gray-600">
+            <p className="text-sm">
+              Showing {artists.length} artist{artists.length !== 1 ? "s" : ""}
+            </p>
+          </div>
         </div>
       </section>
 
@@ -103,7 +211,7 @@ export default function ArtistsPage() {
           </p>
           <Link
             href="/submit"
-            className="inline-block bg-orange-600 text-white px-10 py-4 rounded-xl font-semibold text-lg uppercase tracking-wider no-underline transition-all duration-300 hover:bg-orange-700 hover:-translate-y-1 hover:shadow-lg"
+            className="inline-block bg-engeloop-orange text-white px-10 py-4 rounded-xl font-semibold text-lg uppercase tracking-wider no-underline transition-all duration-300 hover:bg-orange-700 hover:-translate-y-1 hover:shadow-lg"
           >
             Submit Your Music
           </Link>

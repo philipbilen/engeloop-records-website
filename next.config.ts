@@ -34,6 +34,13 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      // --- MODIFIED: Use a wildcard to cover all spotifycdn.com subdomains ---
+      {
+        protocol: "https",
+        hostname: "*.spotifycdn.com",
+        port: "",
+        pathname: "/image/**",
+      },
       // Other image hosts
       {
         protocol: "https",

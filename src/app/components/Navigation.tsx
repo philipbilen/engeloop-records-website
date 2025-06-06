@@ -9,8 +9,8 @@ import { usePathname } from "next/navigation";
 const navLinks = [
   { href: "/about", label: "About" },
   { href: "/artists", label: "Artists" },
-  // { href: "/releases", label: "Releases" },
-  // { href: "/playlists", label: "Playlists" },
+  { href: "/releases", label: "Releases" },
+  { href: "/playlists", label: "Playlistçs" },
   { href: "/contact", label: "Contact" },
 ]; // Home link is usually implicit with the logo
 

@@ -1,9 +1,0 @@
-{
-  "/api/artists/route": "app/api/artists/route.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/artists/page": "app/artists/page.js",
-  "/playlists/page": "app/playlists/page.js",
-  "/about/page": "app/about/page.js",
-  "/page": "app/page.js",
-  "/contact/page": "app/contact/page.js"
-}

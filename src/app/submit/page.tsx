@@ -102,7 +102,8 @@ export default function SubmitPage() {
         additionalInfo: formData.additionalInfo || undefined,
       };
 
-      const response = await fetch("/api/submit-demo", {
+      // --- CHANGE HERE: Updated the API endpoint URL ---
+      const response = await fetch("/api/submissions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

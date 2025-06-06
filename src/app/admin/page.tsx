@@ -1,3 +1,5 @@
+// src/app/admin/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -60,15 +62,39 @@ export default function AdminPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastSync, setLastSync] = useState<SyncResponse | null>(null);
   const [showResults, setShowResults] = useState(false);
-  
+
   const router = useRouter();
   const supabase = createClient();
+
+  const makeAuthenticatedRequest = async (
+    url: string,
+    options: RequestInit = {}
+  ) => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      throw new Error("No active session");
+    }
+
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  };
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
         setStatsLoading(true);
-        const response = await makeAuthenticatedRequest("/api/admin/dashboard-stats");
+        const response = await makeAuthenticatedRequest(
+          "/api/admin/stats/dashboard"
+        );
         const result = await response.json();
 
         if (result.success) {
@@ -85,30 +111,31 @@ export default function AdminPage() {
 
     const checkUser = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
+
         if (error || !user) {
-          router.push('/login');
+          router.push("/login");
           return;
         }
 
-        // Check if user has admin role
-        if (user.user_metadata?.role !== 'admin') {
-          router.push('/unauthorized');
+        if (user.user_metadata?.role !== "admin") {
+          router.push("/unauthorized");
           return;
         }
 
         setUser({
           id: user.id,
           email: user.email!,
-          name: user.user_metadata?.name || user.email?.split('@')[0],
+          name: user.user_metadata?.name || user.email?.split("@")[0],
         });
 
-        // Fetch dashboard stats after user is authenticated
         await fetchDashboardStats();
       } catch (error) {
-        console.error('Error checking user:', error);
-        router.push('/login');
+        console.error("Error checking user:", error);
+        router.push("/login");
       } finally {
         setLoading(false);
       }
@@ -117,11 +144,12 @@ export default function AdminPage() {
     checkUser();
   }, [router, supabase.auth]);
 
-  // Separate function for manual refresh
   const refreshDashboardStats = async () => {
     try {
       setStatsLoading(true);
-      const response = await makeAuthenticatedRequest("/api/admin/dashboard-stats");
+      const response = await makeAuthenticatedRequest(
+        "/api/admin/stats/dashboard"
+      );
       const result = await response.json();
 
       if (result.success) {
@@ -138,70 +166,28 @@ export default function AdminPage() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/login');
+    router.push("/login");
   };
 
-  const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      throw new Error('No active session');
-    }
-
-    return fetch(url, {
-      ...options,
-      headers: {
-        ...options.headers,
-        'Authorization': `Bearer ${session.access_token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-  };
-
-  const handleSpotifyDataRefresh = async () => {
-    setIsRefreshing(true);
-    setShowResults(false);
-
-    try {
-      const response = await makeAuthenticatedRequest("/api/artists/refresh-data", {
-        method: "POST",
-      });
-
-      const result: SyncResponse = await response.json();
-
-      if (result.success) {
-        setLastSync(result);
-        setShowResults(true);
-        alert(
-          `✅ Refresh completed! Updated: ${result.summary.updated}, Failed: ${result.summary.failed}`
-        );
-      } else {
-        throw new Error(result.error || "Refresh failed");
-      }
-    } catch (error) {
-      console.error("Spotify refresh error:", error);
-      alert("❌ Refresh failed. Please check console for details.");
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  const handleSpotifyRefresh = async () => {
+  const handleSyncNewArtists = async () => {
     setIsSyncing(true);
     setShowResults(false);
-
     try {
-      const response = await makeAuthenticatedRequest("/api/artists/sync-spotify", {
-        method: "POST",
-      });
+      const response = await makeAuthenticatedRequest(
+        "/api/artists/actions/sync-spotify",
+        {
+          method: "POST",
+        }
+      );
+      // The API returns { success: true, data: { summary: ..., results: ... } }
+      const result = await response.json();
 
-      const result: SyncResponse = await response.json();
-
+      // FIX: Check for success and access the nested 'data' property
       if (result.success) {
-        setLastSync(result);
+        setLastSync(result.data); // Pass the inner data object to state
         setShowResults(true);
         alert(
-          `✅ Sync completed! Updated: ${result.summary.updated}, Failed: ${result.summary.failed}`
+          `✅ Sync completed! Updated: ${result.data.summary.updated}, Failed: ${result.data.summary.failed}`
         );
       } else {
         throw new Error(result.error || "Sync failed");
@@ -211,6 +197,37 @@ export default function AdminPage() {
       alert("❌ Sync failed. Please check console for details.");
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const handleRefreshData = async () => {
+    setIsRefreshing(true);
+    setShowResults(false);
+    try {
+      const response = await makeAuthenticatedRequest(
+        "/api/artists/actions/refresh-data",
+        {
+          method: "POST",
+        }
+      );
+      // The API returns { success: true, data: { summary: ..., results: ... } }
+      const result = await response.json();
+
+      // FIX: Check for success and access the nested 'data' property
+      if (result.success) {
+        setLastSync(result.data); // Pass the inner data object to state
+        setShowResults(true);
+        alert(
+          `✅ Refresh completed! Updated: ${result.data.summary.updated}, Failed: ${result.data.summary.failed}`
+        );
+      } else {
+        throw new Error(result.error || "Refresh failed");
+      }
+    } catch (error) {
+      console.error("Spotify refresh error:", error);
+      alert("❌ Refresh failed. Please check console for details.");
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -249,13 +266,14 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-engeloop-orange mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading admin dashboard...</p>
+          <p className="text-gray-600 font-medium">
+            Loading admin dashboard...
+          </p>
         </div>
       </div>
     );
   }
 
-  // Helper function to render stat cards
   const renderStatCard = (
     title: string,
     value: number | string,
@@ -267,9 +285,7 @@ export default function AdminPage() {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {title}
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
           {isLoading ? (
             <div className="animate-pulse">
               <div className="h-8 bg-gray-300 rounded w-16 mb-2"></div>
@@ -278,13 +294,17 @@ export default function AdminPage() {
           ) : (
             <>
               <p className={`text-3xl font-bold mb-2 ${colorClass}`}>
-                {typeof value === 'number' ? value.toLocaleString() : value}
+                {typeof value === "number" ? value.toLocaleString() : value}
               </p>
               <p className="text-sm text-gray-600">{description}</p>
             </>
           )}
         </div>
-        <div className={`p-3 ${colorClass.replace('text-', 'bg-').replace('-600', '-100')} rounded-lg`}>
+        <div
+          className={`p-3 ${colorClass
+            .replace("text-", "bg-")
+            .replace("-600", "-100")} rounded-lg`}
+        >
           {icon}
         </div>
       </div>
@@ -293,10 +313,9 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Standardized Header */}
       <StandardHero
         title="ADMIN DASHBOARD"
-        subtitle={`Welcome back, ${user?.name || 'Admin'}`}
+        subtitle={`Welcome back, ${user?.name || "Admin"}`}
         backgroundColor="white"
       >
         <div className="flex items-center justify-center gap-4 mt-4">
@@ -315,7 +334,6 @@ export default function AdminPage() {
       </StandardHero>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {renderStatCard(
             "Pending Submissions",
@@ -325,7 +343,6 @@ export default function AdminPage() {
             "text-blue-600",
             statsLoading
           )}
-
           {renderStatCard(
             "Active Contracts",
             stats?.activeContracts ?? 0,
@@ -334,7 +351,6 @@ export default function AdminPage() {
             "text-green-600",
             statsLoading
           )}
-
           {renderStatCard(
             "Upcoming Releases",
             stats?.upcomingReleases ?? 0,
@@ -343,7 +359,6 @@ export default function AdminPage() {
             "text-purple-600",
             statsLoading
           )}
-
           {renderStatCard(
             "Total Artists",
             stats?.totalArtists ?? 0,
@@ -354,11 +369,12 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* Additional Stats Row */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Recent Activity
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600 mb-1">
@@ -374,9 +390,10 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Quick Stats
+              </h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Approval Rate</span>
@@ -398,15 +415,13 @@ export default function AdminPage() {
                 disabled={statsLoading}
                 className="mt-4 w-full text-sm text-blue-600 hover:text-blue-800 disabled:text-gray-400 transition-colors"
               >
-                {statsLoading ? 'Refreshing...' : 'Refresh Stats'}
+                {statsLoading ? "Refreshing..." : "Refresh Stats"}
               </button>
             </div>
           </div>
         )}
 
-        {/* Quick Actions & Spotify Management */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Quick Actions */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-xl font-work-sans font-semibold text-gray-900 mb-6">
               Quick Actions
@@ -426,8 +441,6 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
-
-          {/* Spotify Data Management */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-xl font-work-sans font-semibold text-gray-900 mb-4">
               Spotify Data Management
@@ -436,10 +449,9 @@ export default function AdminPage() {
               Sync new artists or refresh existing artist data from Spotify
               including images, follower counts, and profile information.
             </p>
-            
             <div className="space-y-4">
               <button
-                onClick={handleSpotifyDataRefresh}
+                onClick={handleSyncNewArtists}
                 disabled={isSyncing || isRefreshing}
                 className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
@@ -450,14 +462,12 @@ export default function AdminPage() {
                   </>
                 ) : (
                   <>
-                    <span className="text-lg">🆕</span>
-                    Sync New Artists
+                    <span className="text-lg">🆕</span>Sync New Artists
                   </>
                 )}
               </button>
-
               <button
-                onClick={handleSpotifyDataRefresh}
+                onClick={handleRefreshData}
                 disabled={isSyncing || isRefreshing}
                 className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
@@ -468,13 +478,11 @@ export default function AdminPage() {
                   </>
                 ) : (
                   <>
-                    <span className="text-lg">🔄</span>
-                    Refresh Existing Data
+                    <span className="text-lg">🔄</span>Refresh Existing Data
                   </>
                 )}
               </button>
             </div>
-
             {lastSync && (
               <div className="mt-4 text-xs text-gray-500 text-center p-3 bg-gray-50 rounded-lg">
                 Last sync: {lastSync.summary.total} artists processed,{" "}
@@ -484,7 +492,6 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Sync Results Display */}
         {showResults && lastSync && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
             <div className="flex justify-between items-center mb-6">
@@ -498,8 +505,6 @@ export default function AdminPage() {
                 ×
               </button>
             </div>
-
-            {/* Summary */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">
@@ -526,8 +531,6 @@ export default function AdminPage() {
                 <div className="text-sm text-gray-600">Failed</div>
               </div>
             </div>
-
-            {/* Detailed Results */}
             <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-lg">
               {lastSync.results.map((result: SyncResult, index: number) => (
                 <div
@@ -560,7 +563,9 @@ export default function AdminPage() {
                       </span>
                     )}
                     <span
-                      className={`text-xs font-medium ${getStatusColor(result.status)}`}
+                      className={`text-xs font-medium ${getStatusColor(
+                        result.status
+                      )}`}
                     >
                       {getStatusText(result.status)}
                     </span>
@@ -571,18 +576,20 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Development Notice */}
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
           <div className="flex items-start gap-3">
             <div className="p-2 bg-yellow-100 rounded-lg">
               <span className="text-yellow-600 text-lg">🚧</span>
             </div>
             <div>
-              <h4 className="font-semibold text-yellow-800 mb-2">Development Mode</h4>
+              <h4 className="font-semibold text-yellow-800 mb-2">
+                Development Mode
+              </h4>
               <p className="text-sm text-yellow-700">
-                This admin dashboard is currently in development. Full functionality including
-                contract management, submission workflow, and database integration will be
-                added in upcoming phases.
+                This admin dashboard is currently in development. Full
+                functionality including contract management, submission
+                workflow, and database integration will be added in upcoming
+                phases.
               </p>
             </div>
           </div>

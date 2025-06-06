@@ -1,8 +1,21 @@
+// src/app/playlists/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
+import StandardHero from "@/app/components/StandardHero";
 
 /* ---------- Types ---------- */
+// The data shape the COMPONENT uses
+interface PlaylistDisplayData {
+  hero: Playlist;
+  supporting: Playlist[];
+  totalFollowers: number;
+  playlistCount: number;
+  success: boolean;
+  lastUpdated: string;
+}
+
 interface Playlist {
   name: string;
   followers: number;
@@ -12,31 +25,32 @@ interface Playlist {
   spotifyUrl: string;
 }
 
-interface PlaylistData {
-  hero: Playlist;
-  supporting: Playlist[];
-  totalFollowers: number;
-  playlistCount: number;
-  success: boolean;
-  lastUpdated: string;
-}
-
-import StandardHero from "@/app/components/StandardHero";
-
 /* ---------- Component ---------- */
 export default function PlaylistsPage() {
-  const [data, setData] = useState<PlaylistData | null>(null);
+  // The state holds the data shape the component needs
+  const [data, setData] = useState<PlaylistDisplayData | null>(null);
   const [loading, setLoading] = useState(true);
 
   /* Fetch playlists on mount */
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
-        const res = await fetch("/api/playlists/all");
-        const json = await res.json();
-        setData(json);
+        const res = await fetch("/api/playlists");
+
+        // This is the response from our API: { success: boolean, data: { ... } }
+        const apiResponse = await res.json();
+
+        // --- CHANGE HERE: Correctly handle the nested data structure ---
+        if (apiResponse.success) {
+          // Pass the nested `data` object to the state setter
+          setData(apiResponse.data);
+        } else {
+          // If the API call failed, set a failure state
+          console.error("API returned an error:", apiResponse.error);
+          setData(null); // Or a specific error state object
+        }
       } catch (err) {
-        console.error("Failed to fetch playlists:", err);
+        console.error("Failed to fetch or parse playlists:", err);
       } finally {
         setLoading(false);
       }
@@ -63,12 +77,13 @@ export default function PlaylistsPage() {
     );
   }
 
+  // Now this check works correctly on the state object
   if (!data?.success) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
           <span className="text-xl font-semibold text-red-600">
-            Failed to load playlists
+            Failed to load playlists. Please try again later.
           </span>
         </div>
       </div>
@@ -76,6 +91,7 @@ export default function PlaylistsPage() {
   }
 
   /* ---------- Page ---------- */
+  // The rest of the JSX can remain unchanged because `data` in the state now has the correct shape
   return (
     <div className="min-h-screen bg-white">
       {/* Standardized Hero */}

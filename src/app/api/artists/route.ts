@@ -1,32 +1,38 @@
-import { NextResponse } from "next/server";
-import { getServiceRoleSupabase, handleSupabaseError } from "@/lib/supabase";
+// src/app/api/artists/route.ts
 
-export async function GET() {
-  try {
-    const supabase = getServiceRoleSupabase();
+import { withErrorHandling, ErrorFactory } from "@/lib/errorHandling";
+import { createSuccessResponse, createErrorResponse } from "@/lib/apiUtils";
+import { logger } from "@/lib/logger";
+import { artistService } from "@/lib/services/artistService";
 
-    const { data, error } = await supabase
-      .from("artists")
-      .select(
-        "id, artist_name, image_url, spotify_url, apple_music_url, instagram_url"
-      )
-      .order("artist_name", { ascending: true });
+// 1. Define the core logic in a simple async function.
+// It returns a complete NextResponse on success or throws an error on failure.
+async function handler() {
+  const artists = await artistService.getAllArtists();
+  logger.info(`Service successfully fetched ${artists.length} artists.`);
+  return createSuccessResponse(artists);
+}
 
-    if (error) {
-      const { error: errorMsg, status } = handleSupabaseError(
-        error,
-        "GET /api/artists"
-      );
-      return NextResponse.json({ error: errorMsg }, { status });
-    }
+// 2. Export a GET function that uses our robust wrapper pattern.
+export const GET = async (request: Request) => {
+  // `withErrorHandling` will execute our handler and catch any errors.
+  const result = await withErrorHandling(handler, {
+    operation: "fetch_all_artists",
+  });
 
-    console.log(`Fetched ${data?.length || 0} artists from database`);
-    return NextResponse.json(data || []);
-  } catch (error: unknown) {
-    console.error("API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+  // If the wrapper caught an error, result.error will be populated.
+  if (result.error) {
+    logger.api("GET", "/api/artists", result.error.statusCode || 500, {
+      errorType: result.error.type,
+      completed: true,
+    });
+    return createErrorResponse(
+      result.error.userMessage,
+      result.error.statusCode || 500
     );
   }
-}
+
+  // If successful, result.data contains the NextResponse we created in the handler.
+  logger.api("GET", "/api/artists", 200, { completed: true });
+  return result.data!;
+};

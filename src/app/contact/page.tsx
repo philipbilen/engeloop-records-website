@@ -1,175 +1,106 @@
-import Link from 'next/link'
+import Link from "next/link";
+import StandardHero from "@/app/components/StandardHero"; // Import StandardHero
+import { Mail, MessageSquare, MapPin, Clock } from "lucide-react"; // Optional: for icons
 
 export default function ContactPage() {
   return (
     <div>
-      {/* Header Section */}
-      <section style={{ padding: '60px 16px', backgroundColor: '#f9fafb' }}>
-        <div
-          style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}
-        >
-          <h1
-            style={{
-              fontSize: 'clamp(2.5rem, 6vw, 3.5rem)',
-              fontWeight: '700',
-              color: '#111827',
-              marginBottom: '16px',
-              fontFamily: "'Space Grotesk', system-ui, sans-serif",
-            }}
-          >
-            Contact Us
-          </h1>
-          <p
-            style={{
-              fontSize: '1.25rem',
-              color: '#6b7280',
-              lineHeight: '1.6',
-            }}
-          >
-            Get in touch with Engeloop Records
-          </p>
-        </div>
-      </section>
+      {/* Standardized Hero Section */}
+      <StandardHero
+        title="GET IN TOUCH"
+        subtitle="We're here to help and answer any question you might have. We look forward to hearing from you!"
+        backgroundColor="gradient" // Or "gray" if you prefer the original subtle background
+      />
 
-      {/* Contact Information */}
-      <section style={{ padding: '80px 16px', backgroundColor: 'white' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div
-            style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              padding: '32px',
-              border: '1px solid #f3f4f6',
-            }}
-          >
-            <h2
-              style={{
-                fontSize: '1.875rem',
-                fontWeight: '600',
-                marginBottom: '24px',
-                color: '#111827',
-                fontFamily: "'Space Grotesk', system-ui, sans-serif",
-              }}
-            >
-              Get In Touch
+      {/* Contact Information Section - Refactored with Tailwind CSS */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-xl shadow-sm p-8 sm:p-10 border border-gray-100">
+            <h2 className="text-3xl font-work-sans font-semibold mb-8 text-gray-900 text-center sm:text-left">
+              Contact Details
             </h2>
-            
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-                marginBottom: '32px',
-              }}
-            >
-              <div>
-                <h3
-                  style={{
-                    fontSize: '1.125rem',
-                    fontWeight: '600',
-                    marginBottom: '8px',
-                    color: '#111827',
-                  }}
-                >
-                  General Inquiries
-                </h3>
-                <p style={{ color: '#6b7280', marginBottom: '4px' }}>
-                  Email: info@engelooprecords.com
-                </p>
-                <p style={{ color: '#6b7280' }}>
-                  Response time: 24-48 hours
-                </p>
+
+            <div className="space-y-8 mb-10">
+              {/* General Inquiries */}
+              <div className="flex items-start gap-4">
+                <Mail className="w-6 h-6 text-engeloop-orange mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl font-work-sans font-semibold mb-1 text-gray-900">
+                    General Inquiries
+                  </h3>
+                  <p className="text-gray-500 mb-0.5">
+                    Email:{" "}
+                    <a
+                      href="mailto:info@engelooprecords.com"
+                      className="text-engeloop-orange hover:underline"
+                    >
+                      info@engelooprecords.com
+                    </a>
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Response time: 24-48 hours
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h3
-                  style={{
-                    fontSize: '1.125rem',
-                    fontWeight: '600',
-                    marginBottom: '8px',
-                    color: '#111827',
-                  }}
-                >
-                  Demo Submissions
-                </h3>
-                <p style={{ color: '#6b7280', marginBottom: '4px' }}>
-                  Use our submission form for fastest review
-                </p>
-                <p style={{ color: '#6b7280' }}>
-                  Response time: 7-14 business days
-                </p>
+              {/* Demo Submissions */}
+              <div className="flex items-start gap-4">
+                <MessageSquare className="w-6 h-6 text-engeloop-orange mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl font-work-sans font-semibold mb-1 text-gray-900">
+                    Demo Submissions
+                  </h3>
+                  <p className="text-gray-500 mb-0.5">
+                    Use our submission form for the fastest review.
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Response time: 7-14 business days
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h3
-                  style={{
-                    fontSize: '1.125rem',
-                    fontWeight: '600',
-                    marginBottom: '8px',
-                    color: '#111827',
-                  }}
-                >
-                  Business Address
-                </h3>
-                <p style={{ color: '#6b7280' }}>
-                  Waterpoint Apartments, A6102<br />
-                  SLM 1020, Sliema, Malta
-                </p>
+              {/* Business Address */}
+              <div className="flex items-start gap-4">
+                <MapPin className="w-6 h-6 text-engeloop-orange mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl font-work-sans font-semibold mb-1 text-gray-900">
+                    Business Address
+                  </h3>
+                  <p className="text-gray-500">
+                    Waterpoint Apartments, A6102
+                    <br />
+                    SLM 1020, Sliema, Malta
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h3
-                  style={{
-                    fontSize: '1.125rem',
-                    fontWeight: '600',
-                    marginBottom: '8px',
-                    color: '#111827',
-                  }}
-                >
-                  Business Hours
-                </h3>
-                <p style={{ color: '#6b7280' }}>
-                  Monday - Friday: 9:00 AM - 6:00 PM CET<br />
-                  Weekend: By appointment only
-                </p>
+              {/* Business Hours */}
+              <div className="flex items-start gap-4">
+                <Clock className="w-6 h-6 text-engeloop-orange mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl font-work-sans font-semibold mb-1 text-gray-900">
+                    Business Hours
+                  </h3>
+                  <p className="text-gray-500">
+                    Monday - Friday: 9:00 AM - 6:00 PM CET
+                    <br />
+                    Weekend: By appointment only
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                gap: '16px',
-                flexWrap: 'wrap',
-              }}
-            >
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-gray-100">
               <Link
                 href="/submit"
-                style={{
-                  backgroundColor: '#000',
-                  color: 'white',
-                  padding: '12px 24px',
-                  borderRadius: '6px',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  display: 'inline-block',
-                  transition: 'all 0.2s ease',
-                }}
+                className="w-full sm:w-auto flex-grow sm:flex-grow-0 text-center bg-gray-900 text-white px-6 py-3 rounded-md font-medium no-underline transition-all duration-200 hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg"
               >
                 Submit Demo
               </Link>
               <a
                 href="mailto:info@engelooprecords.com"
-                style={{
-                  border: '1px solid #d1d5db',
-                  color: '#374151',
-                  padding: '12px 24px',
-                  borderRadius: '6px',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  display: 'inline-block',
-                  transition: 'all 0.2s ease',
-                }}
+                className="w-full sm:w-auto flex-grow sm:flex-grow-0 text-center border border-gray-300 text-gray-700 px-6 py-3 rounded-md font-medium no-underline transition-all duration-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-md"
               >
                 Send Email
               </a>
@@ -178,5 +109,5 @@ export default function ContactPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -90,7 +90,7 @@ export default function ArtistsPage() {
         <StandardHero
           title="OUR ARTISTS"
           subtitle="Discover the talented artists who shape the sound of Engeloop Records"
-          backgroundImage="/media/Iniye_Cover.jpg"
+          // backgroundImage="/media/Iniye_Cover.jpg"
           textColor="light"
         />
         <section className="py-24 bg-white">
@@ -113,7 +113,7 @@ export default function ArtistsPage() {
         <StandardHero
           title="OUR ARTISTS"
           subtitle="Discover the talented artists who shape the sound of Engeloop Records"
-          backgroundImage="/media/Iniye_Cover.jpg"
+          // backgroundImage="/media/Iniye_Cover.jpg"
           textColor="light"
         />
         <section className="py-24 bg-white">
@@ -137,7 +137,7 @@ export default function ArtistsPage() {
         <StandardHero
           title="OUR ARTISTS"
           subtitle="Discover the talented artists who shape the sound of Engeloop Records"
-          backgroundImage="/media/Iniye_Cover.jpg"
+          // backgroundImage="/media/Iniye_Cover.jpg"
           textColor="light"
         />
         <section className="py-24 bg-white">
@@ -164,7 +164,8 @@ export default function ArtistsPage() {
       <StandardHero
         title="OUR ARTISTS"
         subtitle="Discover the talented artists who shape the sound of Engeloop Records"
-        backgroundImage="/media/Iniye_Cover.jpg"
+        backgroundImage="/media/atabaque.jpg"
+        backgroundPosition="50% 25%"
         textColor="light"
       />
 

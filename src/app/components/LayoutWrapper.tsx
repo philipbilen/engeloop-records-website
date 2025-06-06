@@ -1,3 +1,4 @@
+// src/app/components/LayoutWrapper.tsx
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -12,7 +13,8 @@ export default function LayoutWrapper({
   const isHomepage = pathname === "/";
 
   if (isHomepage) {
-    // Homepage gets no wrapper - full control
+    // Homepage gets no wrapper - full control by src/app/page.tsx
+    // ConditionalNavigation will render null here as per its logic.
     return (
       <>
         <ConditionalNavigation />
@@ -24,8 +26,10 @@ export default function LayoutWrapper({
   // All other pages get the standard layout
   return (
     <div className="min-h-screen bg-gray-50">
-      <ConditionalNavigation />
-      <main className="pt-20">{children}</main>
+      <ConditionalNavigation /> {/* This will render <Navigation /> */}
+      {/* Remove pt-20 from main. StandardHero and other page content
+          should handle their own top spacing if they are the first element. */}
+      <main>{children}</main>
     </div>
   );
 }

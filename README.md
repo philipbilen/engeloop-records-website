@@ -1,291 +1,119 @@
-# Engeloop Records
+TL;DR
 
-A modern, full-stack web application for Engeloop Records - a boutique record label specializing in Afro House and Deep House music, based in Sliema, Malta.
+Engeloop-Records is a Next.js 15 App-Router application written in TypeScript.
+Data lives in Supabase and is surfaced through REST-style routes under src/app/api.
+The UI is React + Tailwind; state is kept minimal and fetched on demand.
+Run npm install && cp .env.example .env.local && npm run dev to get going.
+Focus areas for the next pass: tighten route names, delete dead pages, extract repeated UI, and add tests.
 
-## 🎵 What We're Building
+⸻
 
-This is a comprehensive digital platform that serves as the main hub for Engeloop Records, featuring:
+1. What this project does
 
-- **Artist Showcase** - Professional artist profiles with Spotify integration
-- **Demo Submission System** - Secure, validated submission workflow for new artists
-- **Playlist Management** - Integration with Spotify playlists and follower analytics
-- **Admin Dashboard** - Complete content management and artist data synchronization
-- **Responsive Design** - Beautiful, mobile-first interface that works on all devices
+A small, label-centric site that 1. shows artists, playlists, releases, etc, via static pages in src/app/\* 2. exposes secured admin and Claude endpoints for syncing Spotify data and handling demo submissions 3. stores everything in Supabase and logs activity with a lightweight logger
 
-## 🚀 Tech Stack
+Package metadata: Next 15.3.3, React 19, Supabase JS 2 and Zod for validation ￼.
 
-### Frontend
+⸻
 
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-- **Lucide React** - Modern icon system
-- **React Icons** - Additional icon library
+2. Quick start
 
-### Backend & Database
-
-- **Supabase** - Backend-as-a-Service
-  - PostgreSQL database
-  - Authentication & authorization
-  - Row Level Security (RLS)
-  - File storage (for future file uploads)
-- **Next.js API Routes** - Server-side API endpoints
-
-### External Integrations
-
-- **Spotify Web API** - Artist data, images, and metadata
-- **Advanced matching algorithms** with confidence scoring
-- **Rate limiting** and error handling
-
-### Development Tools
-
-- **ESLint** - Code linting and formatting
-- **TypeScript** - Static type checking
-- **PostCSS** - CSS processing
-- **Autoprefixer** - CSS vendor prefixes
-
-## 📋 Prerequisites
-
-Before running this project, make sure you have:
-
-- **Node.js** (v18 or higher)
-- **npm** (v9 or higher)
-- **Supabase account** and project
-- **Spotify Developer account** and app credentials
-
-## ⚙️ Environment Variables
-
-Create a `.env.local` file in the root directory with the following variables:
-
-```bash
-# Spotify API Configuration
-SPOTIFY_CLIENT_ID=your_spotify_client_id
-SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-
-# Admin Authentication (for legacy API routes if needed)
-API_SECRET_KEY=your_secure_api_secret_key
-```
-
-### Getting Your Credentials
-
-#### Supabase Setup
-
-1. Go to [supabase.com](https://supabase.com) and create a new project
-2. In your project dashboard, go to **Settings > API**
-3. Copy your **Project URL** and **anon public** key
-4. Copy your **service_role** key (keep this secret!)
-
-#### Spotify Setup
-
-1. Go to [Spotify for Developers](https://developer.spotify.com/)
-2. Create a new app in your dashboard
-3. Copy your **Client ID** and **Client Secret**
-4. Add `http://localhost:3000` to your redirect URIs (for development)
-
-## 🛠️ Installation & Setup
-
-### 1. Clone the Repository
-
-```bash
-git clone <repository-url>
+git clone <repo>
 cd engeloop-records
-```
-
-### 2. Install Dependencies
-
-```bash
 npm install
-```
+cp .env.example .env.local # fill in Spotify & Supabase keys
+npm run dev # localhost:3000
 
-### 3. Set Up Database Tables
+Main scripts live in package.json: dev, build, start, lint ￼.
 
-Run the following SQL in your Supabase SQL Editor:
+⸻
 
-```sql
--- Create artists table
-CREATE TABLE IF NOT EXISTS artists (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  artist_name TEXT NOT NULL,
-  image_url TEXT,
-  spotify_url TEXT,
-  apple_music_url TEXT,
-  instagram_url TEXT,
-  spotify_id TEXT UNIQUE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+3. Project layout (top level)
 
--- Create demo submissions table
-CREATE TABLE IF NOT EXISTS demo_submissions (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  artist_name TEXT NOT NULL,
-  track_title TEXT NOT NULL,
-  genres TEXT[] NOT NULL DEFAULT '{}',
-  instagram_handle TEXT,
-  spotify_profile_url TEXT,
-  additional_info TEXT,
-  bpm INTEGER,
-  submission_status TEXT DEFAULT 'pending' CHECK (submission_status IN ('pending', 'reviewing', 'approved', 'rejected')),
-  submitted_at TIMESTAMPTZ DEFAULT NOW(),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Enable RLS
-ALTER TABLE artists ENABLE ROW LEVEL SECURITY;
-ALTER TABLE demo_submissions ENABLE ROW LEVEL SECURITY;
-
--- Create policies for service role access
-CREATE POLICY "Service role can manage artists" ON artists FOR ALL TO service_role USING (true) WITH CHECK (true);
-CREATE POLICY "Service role can manage demo submissions" ON demo_submissions FOR ALL TO service_role USING (true) WITH CHECK (true);
-```
-
-### 4. Create Admin User
-
-1. In your Supabase dashboard, go to **Authentication > Users**
-2. Click **Add User** and create an admin account
-3. After creating the user, update their metadata:
-
-```sql
-UPDATE auth.users
-SET raw_user_meta_data = jsonb_build_object(
-  'role', 'admin',
-  'name', 'Admin User'
-)
-WHERE email = 'your-admin-email@example.com';
-```
-
-### 5. Run the Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the application.
-
-## 🏗️ Project Structure
-
-```
 engeloop-records/
-├── src/
-│   ├── app/
-│   │   ├── admin/           # Admin dashboard
-│   │   ├── artists/         # Artist showcase
-│   │   ├── playlists/       # Playlist display
-│   │   ├── submit/          # Demo submission form
-│   │   ├── login/           # Authentication
-│   │   ├── api/             # API routes
-│   │   └── components/      # Reusable components
-│   └── lib/
-│       ├── supabase.ts      # Database client
-│       ├── spotify.ts       # Spotify API integration
-│       └── auth.ts          # Authentication utilities
-├── public/                  # Static assets
-├── middleware.ts            # Route protection
-└── tailwind.config.js       # Styling configuration
-```
+├─ src/
+│ ├─ app/ # route handlers & pages (Next App Router)
+│ │ ├─ api/ # server-only endpoints
+│ │ ├─ components/ # shared UI
+│ │ └─ ... # artists, playlists, releases, etc
+│ ├─ lib/ # server helpers (Supabase, Spotify, auth, logger…)
+│ └─ types/ # shared TypeScript types
+├─ public/ # static assets (not shown in gitingest)
+└─ config files # eslint, tailwind, tsconfig, etc.
 
-## 🎯 Key Features
+See the generated tree snippet for the exact paths ￼.
 
-### Artist Management
+⸻
 
-- **Spotify Integration** - Automatic artist data synchronization
-- **Confidence Scoring** - Smart matching algorithms for artist identification
-- **Image Management** - Automatic profile image fetching and optimization
-- **Social Media Links** - Instagram, Spotify, and Apple Music integration
+4. Key moving parts
 
-### Demo Submission System
+Area File(s) Notes
+Request gating middleware.ts Redirects non-admins away from /admin and protects /login ￼
+API layer src/app/api/\* - /artists, /playlists, /submit-demo, etc.- Claude-specific routes for AI workflows ￼
+Data access lib/supabase.ts Centralised client; service-role helper ￼
+Spotify sync lib/spotify.ts, spotifyConstants.ts Rate-limited wrapper with genre weights ￼
+Validation lib/validation.ts Zod schemas for demo submissions
+Rate limiting lib/rateLimiting.ts Generic limiter used by demo and admin routes ￼
+Logging lib/logger.ts Dev-emoji + prod JSON logging, perf helpers ￼
+Styling tailwind.config.js + globals.css Custom Engeloop palette and utilities ￼
 
-- **Secure API** - Server-side validation and rate limiting
-- **Multi-genre Support** - Flexible genre selection with custom categories
-- **Email Notifications** - Automatic confirmation and status updates
-- **Admin Review Workflow** - Streamlined submission management
+⸻
 
-### Admin Dashboard
+5. Data and control flow
+   1. Client page fetches data via fetch('/api/artists') or getServerSideProps equivalent.
+   2. API handler validates input, checks rate limit, hits Supabase and returns JSON.
+   3. Supabase triggers are not in repo; all business logic stays in the API layer.
+   4. Logger captures timing and errors; output level controlled by LOG_LEVEL.
 
-- **Real-time Analytics** - Submission tracking and artist statistics
-- **Spotify Sync Tools** - Bulk artist data updates and management
-- **Secure Authentication** - Role-based access control
-- **Activity Monitoring** - Comprehensive logging and audit trails
+⸻
 
-### Security Features
+6. Environment variables
 
-- **Row Level Security** - Database-level access control
-- **JWT Authentication** - Secure session management
-- **Rate Limiting** - Protection against spam and abuse
-- **Input Validation** - Comprehensive server-side validation
-- **CSRF Protection** - Built-in Next.js security features
+Copy .env.example and supply:
+• SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET
+• NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY
+• SUPABASE_SERVICE_ROLE_KEY (server only)
+plus optional flags for rate limits and feature toggles ￼.
 
-## 🔧 Development
+⸻
 
-### Available Scripts
+7. Common tasks
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+Task Command / URL
+Run dev server npm run dev
+Lint npm run lint
+Build prod npm run build && npm start
+Refresh artist data POST /api/artists/refresh-data (admin token required)
+Sync Spotify stats POST /api/artists/sync-spotify
+List all playlists GET /api/playlists/all
 
-### Code Style
+⸻
 
-- **TypeScript** for type safety
-- **ESLint** for code quality
-- **Prettier** for consistent formatting
-- **Tailwind CSS** for styling
+8. Deployment
+   1. Set env vars on Vercel / Fly / Docker host.
+   2. Ensure Supabase URL allows RLS bypass for service-role key.
+   3. Configure the same image domains in next.config.ts that Vercel uses ￼.
+   4. npm run build and serve with next start or let Vercel handle.
 
-### API Endpoints
+⸻
 
-#### Public Endpoints
+9. What to tighten next
+   • Delete duplicate pages like about/page 2.tsx and playlists/page 2.tsx.
+   • Consolidate API routes naming: stick to kebab-case or nested folders, not both.
+   • Extract repeated hero and nav styles into a single component.
+   • Add unit tests for lib/spotify, rateLimiting, and errorHandling.
+   • Document Supabase schema version so migrations are reproducible.
+   • Consider moving Claude routes behind a separate /internal prefix.
+   • Replace console.log in API handlers with logger.api.
 
-- `GET /api/artists` - Fetch all artists
-- `GET /api/playlists/all` - Fetch playlist data
-- `POST /api/submit-demo` - Submit demo (with validation)
+(Pick one per session so perfectionism does not stall progress.)
 
-#### Protected Admin Endpoints
+⸻
 
-- `POST /api/artists/sync-spotify` - Sync new artists from Spotify
-- `POST /api/artists/refresh-data` - Update existing artist data
+10. Personal reminders
+    • Commit small vertical slices—feature, test, docs—instead of broad vibe coding.
+    • When energy dips, create an issue instead of half-coding a fix.
+    • logger.performance() is your friend for spotting slow endpoints.
+    • Keep README short; expand in /docs if needed later.
 
-## 🚀 Deployment
-
-### Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add your environment variables in Vercel dashboard
-4. Deploy automatically on every push
-
-### Environment Variables for Production
-
-Make sure to set all the environment variables from `.env.local` in your production environment.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is proprietary software for Engeloop Records.
-
-## 📞 Contact
-
-**Engeloop Records**
-
-- Email: info@engelooprecords.com
-- Address: Waterpoint Apartments, A6102, SLM 1020, Sliema, Malta
-- Website: [https://engelooprecords.com](https://engelooprecords.com)
-
----
-
-Built with ❤️ for the music community
+Take a break now if you have been staring at this for more than 45 minutes.

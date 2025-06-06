@@ -1,8 +1,210 @@
-node_modules
+# ==============================================
+# ENGELOOP RECORDS - .gitignore
+# ==============================================
+
+# ==============================================
+# ENVIRONMENT & SECRETS
+# ==============================================
+# Environment files (CRITICAL - contains API keys)
 .env
-dist
-.cache
-/public
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Custom scripts that might contain secrets
 export-for-claude.js
 test-claude-api.js
+
+# ==============================================
+# DEPENDENCIES
+# ==============================================
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Package manager lock files (keep package-lock.json in most cases)
+# yarn.lock
+# pnpm-lock.yaml
+
+# ==============================================
+# NEXT.JS BUILD OUTPUT
+# ==============================================
+# Next.js build output
+.next/
+out/
+dist/
+
+# Cache directories
+.cache/
+.turbo/
+
+# ==============================================
+# DEVELOPMENT & EDITOR FILES
+# ==============================================
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS system files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==============================================
+# LOGS & DEBUGGING
+# ==============================================
+# Log files
+logs/
+*.log
+lerna-debug.log*
+
+# Debug files
+.nyc_output
+coverage/
+
+# ==============================================
+# RUNTIME & TEMPORARY FILES
+# ==============================================
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary folders
+tmp/
+temp/
+
+# ==============================================
+# TESTING
+# ==============================================
+# Test coverage
+coverage/
+.nyc_output/
+
+# Jest
+.coverage/
+
+# ==============================================
+# BUILD ARTIFACTS
+# ==============================================
+# Build outputs
+build/
+dist/
+public/sitemap.xml
+public/robots.txt
+
+# Static generation
+.vercel/
+
+# ==============================================
+# DATABASE & STORAGE
+# ==============================================
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Database dumps
+*.sql
+
+# ==============================================
+# MEDIA & UPLOADS
+# ==============================================
+# Uploaded files (if you implement file uploads)
+uploads/
+demo-files/
+temp-uploads/
+
+# Generated images/thumbnails
+.thumbnails/
+
+# ==============================================
+# ANALYTICS & MONITORING
+# ==============================================
+# Bundle analyzer
+.bundle-analyzer/
+
+# Lighthouse CI
+.lighthouseci/
+
+# ==============================================
+# MISC GENERATED FILES
+# ==============================================
+# TypeScript build info
+*.tsbuildinfo
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# Stylelint cache
+.stylelintcache
+
+# Storybook build outputs
+storybook-static/
+
+# ==============================================
+# PRODUCTION SPECIFIC
+# ==============================================
+# PM2 ecosystem file with sensitive data
+ecosystem.config.js
+
+# Docker
+Dockerfile.prod
+docker-compose.prod.yml
+
+# ==============================================
+# BACKUP & ARCHIVE FILES
+# ==============================================
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# ==============================================
+# SUPABASE SPECIFIC
+# ==============================================
+# Supabase CLI (if you use it)
+supabase/.env
+
+# ==============================================
+# SPOTIFY API CACHE (if you implement caching)
+# ==============================================
+.spotify-cache/
+spotify-token-cache.json
+
+# ==============================================
+# CUSTOM SCRIPTS & UTILITIES
+# ==============================================
+# Any custom deployment or utility scripts that might contain secrets
+deploy.sh
+sync-production.js
+backup-db.js
+
+# ==============================================
+# DUPLICATE FILES (from your current structure)
+# ==============================================
+# Remove duplicate files from tracking
+package-lock\ 2
+*\ 2.tsx
+*\ 2.js
+*\ 2.ts

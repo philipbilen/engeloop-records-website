@@ -151,14 +151,16 @@ export interface SyncResult {
   error?: unknown;
 }
 
+export interface SyncSummary {
+  total: number;
+  updated: number;
+  skipped: number;
+  failed: number;
+}
+
 export interface SyncResponse {
   success: boolean;
-  summary: {
-    total: number;
-    updated: number;
-    skipped: number;
-    failed: number;
-  };
+  summary: SyncSummary;
   results: SyncResult[];
   error?: string;
 }

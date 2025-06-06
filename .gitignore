@@ -33,10 +33,14 @@ pnpm-debug.log*
 # ==============================================
 # NEXT.JS BUILD OUTPUT
 # ==============================================
-# Next.js build output
+# Next.js cache and build files
 .next/
-out/
+.next/cache/
 dist/
+out/
+
+# Webpack cache
+.webpack/
 
 # Cache directories
 .cache/
@@ -215,3 +219,5 @@ package-lock\ 2
 # ==============================================
 # Public assets that should not be tracked
 public/media
+
+README.md

@@ -4,3 +4,5 @@ dist
 .cache
 /public
 .env.local
+export-for-claude.js
+test-claude-api.js

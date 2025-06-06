@@ -208,3 +208,10 @@ package-lock\ 2
 *\ 2.tsx
 *\ 2.js
 *\ 2.ts
+
+
+# ==============================================
+# PUBLIC ASSETS
+# ==============================================
+# Public assets that should not be tracked
+public/media

@@ -15,14 +15,19 @@ import {
 export default function AboutPage() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
+      {/* Enhanced Hero Section */}
       <StandardHero
-        title="ABOUT ENGELOOP RECORDS"
-        subtitle="Discover the story behind our passion for Afro House and Deep House music"
-        description="Based in Sliema, Malta, we're a boutique record label dedicated to discovering and promoting exceptional electronic music that moves both body and soul."
-        backgroundImage="/media/studio-background.jpg" // You could use a studio/label image
-        backgroundPosition="center"
+        title="Curating electronic music that moves both body and soul"
+        subtitle="Independent. Afro House. Built on relationships."
+        description="Based in Sliema, Malta, we're a boutique record label dedicated to discovering exceptional talent and building lasting partnerships with artists who share our passion."
+        backgroundImage="/media/BringMeLove.jpg" // Using your updated hero image
+        backgroundPosition="50% 25%"
         textColor="light"
+        titleStyle="refined"
+        showCTA={true}
+        ctaText="See Our Artists"
+        ctaHref="/artists"
+        ctaVariant="primary"
       />
 
       {/* Story Section */}

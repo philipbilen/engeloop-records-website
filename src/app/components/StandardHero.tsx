@@ -1,6 +1,8 @@
 // src/app/components/StandardHero.tsx
 
 import React from "react";
+import Link from "next/link";
+import { Button } from "./ui/Button";
 
 interface StandardHeroProps {
   title: string;
@@ -10,7 +12,18 @@ interface StandardHeroProps {
   backgroundColor?: "white" | "gray" | "gradient";
   textColor?: "dark" | "light";
   children?: React.ReactNode;
-  backgroundPosition?: string; // <--- New prop
+  backgroundPosition?: string;
+
+  // NEW: CTA Support
+  showCTA?: boolean;
+  ctaText?: string;
+  ctaHref?: string;
+  ctaVariant?: "primary" | "secondary" | "outline";
+
+  // NEW: Typography Flexibility
+  titleStyle?: "default" | "refined" | "custom";
+  customTitleClasses?: string;
+  customSubtitleClasses?: string;
 }
 
 export default function StandardHero({
@@ -21,10 +34,21 @@ export default function StandardHero({
   backgroundColor = "gradient",
   textColor = "dark",
   children,
-  backgroundPosition = "center", // Default to 'center' if not provided
+  backgroundPosition = "center",
+
+  // CTA props
+  showCTA = false,
+  ctaText = "Learn More",
+  ctaHref = "#",
+  ctaVariant = "primary",
+
+  // Typography props
+  titleStyle = "default",
+  customTitleClasses,
+  customSubtitleClasses,
 }: StandardHeroProps) {
   const sectionClasses = backgroundImage
-    ? "pt-0 pb-20 min-h-[60vh] flex items-center justify-center" // Consider adjusting min-h if needed for positioning
+    ? "pt-0 pb-20 min-h-[60vh] flex items-center justify-center"
     : "pt-32 pb-16";
 
   const contentPaddingTop = backgroundImage ? "pt-32" : "";
@@ -33,7 +57,6 @@ export default function StandardHero({
     white: "bg-white",
     gray: "bg-gray-50",
     gradient: "bg-gradient-to-b from-white to-gray-50",
-    cream: "bg-engeloop-cream/30",
   };
 
   const textClasses = {
@@ -49,11 +72,24 @@ export default function StandardHero({
     },
   };
 
+  // Typography styles
+  const titleStyles = {
+    default: `text-section-title font-work-sans font-bold`,
+    refined: `text-hero-primary`, // Uses our new typography classes
+    custom: customTitleClasses || `text-section-title font-work-sans font-bold`,
+  };
+
+  const subtitleStyles = {
+    default: `text-xl font-inter font-medium`,
+    refined: `text-hero-subtitle`, // Uses our new typography classes
+    custom: customSubtitleClasses || `text-xl font-inter font-medium`,
+  };
+
   const backgroundStyle = backgroundImage
     ? {
         backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), url(${backgroundImage})`,
         backgroundSize: "cover",
-        backgroundPosition: backgroundPosition, // <--- Use the prop here
+        backgroundPosition: backgroundPosition,
         backgroundRepeat: "no-repeat",
       }
     : {};
@@ -68,12 +104,28 @@ export default function StandardHero({
       <div
         className={`max-w-6xl mx-auto text-center relative z-10 ${contentPaddingTop}`}
       >
-        <h1 className="text-hero-primary text-white mb-6 text-shadow-hero">
+        {/* Main Title */}
+        <h1
+          className={`${titleStyles[titleStyle]} ${
+            textClasses[textColor].title
+          } mb-4 tracking-tight ${
+            backgroundImage && textColor === "light" ? "text-shadow-hero" : ""
+          }`}
+        >
           {title}
         </h1>
 
+        {/* Subtitle */}
         {subtitle && (
-          <p className="text-hero-subtitle text-white/90 max-w-3xl mx-auto mb-4 text-shadow-subtle">
+          <p
+            className={`${subtitleStyles[titleStyle]} ${
+              textClasses[textColor].subtitle
+            } max-w-3xl mx-auto mb-4 ${
+              backgroundImage && textColor === "light"
+                ? "text-shadow-subtle"
+                : ""
+            }`}
+          >
             {subtitle}
           </p>
         )}
@@ -81,15 +133,32 @@ export default function StandardHero({
         {/* Description */}
         {description && (
           <p
-            className={`text-large font-inter ${textClasses[textColor].description} max-w-4xl mx-auto leading-relaxed`}
+            className={`text-large font-inter ${textClasses[textColor].description} max-w-4xl mx-auto leading-relaxed mb-6`}
           >
             {description}
           </p>
         )}
 
+        {/* CTA Button */}
+        {showCTA && ctaHref && (
+          <div className="mt-8">
+            <Link href={ctaHref} className="inline-block">
+              <Button
+                variant={ctaVariant}
+                size="lg"
+                className="tracking-wide uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-engeloop"
+              >
+                {ctaText}
+              </Button>
+            </Link>
+          </div>
+        )}
+
         {/* Custom children content */}
         {children && <div className="mt-6">{children}</div>}
       </div>
+
+      {/* Decorative wave for background images - removed as per feedback */}
     </section>
   );
 }

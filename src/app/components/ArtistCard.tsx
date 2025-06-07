@@ -38,8 +38,9 @@ export default function ArtistCard({ artist }: { artist: Artist }) {
   ].filter((link) => link.url);
 
   return (
-    <div className="bg-white shadow-lg rounded overflow-hidden max-w-80 w-full transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl">
-      <div className="h-[20rem] sm:h-[22rem] relative bg-gray-100">
+    <div className="bg-white overflow-hidden w-80 h-96 relative group transition-all duration-300">
+      {/* Main Image Container */}
+      <div className="h-full relative bg-gray-100 overflow-hidden">
         {artist.image_url && !imageError ? (
           <Image
             src={artist.image_url}
@@ -47,10 +48,11 @@ export default function ArtistCard({ artist }: { artist: Artist }) {
             fill
             sizes="320px"
             style={{ objectFit: "cover" }}
+            className="transition-transform duration-300 group-hover:scale-110"
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-orange-200 to-orange-500 flex items-center justify-center">
+          <div className="w-full h-full bg-gradient-to-br from-orange-200 to-orange-500 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
             <div className="text-center">
               <div className="text-6xl mb-2">🎵</div>
               <p className="text-white font-bold text-lg uppercase px-4">
@@ -59,32 +61,38 @@ export default function ArtistCard({ artist }: { artist: Artist }) {
             </div>
           </div>
         )}
+
+        {/* Artist Name Overlay (Always Visible) */}
         <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/70 to-transparent"></div>
         <div className="absolute top-6 left-0 right-0 text-center">
           <h3 className="text-2xl font-bold text-white uppercase px-4">
             {artist.artist_name}
           </h3>
         </div>
-      </div>
-      <div className="p-6 bg-engeloop-orange flex justify-center gap-5 min-h-20">
-        {socialLinks.length > 0 ? (
-          socialLinks.map(({ icon: Icon, color, url, name }) => (
-            <a
-              key={name}
-              href={url!}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gray-50 text-gray-400 transition-all duration-300 hover:scale-110"
-              style={{ color }}
-            >
-              <Icon size={24} />
-            </a>
-          ))
-        ) : (
-          <div className="flex items-center justify-center h-14 text-gray-400 text-sm italic">
-            Coming soon...
+
+        {/* Social Icons Overlay (Hover Only) */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+          <div className="flex justify-center gap-4">
+            {socialLinks.length > 0 ? (
+              socialLinks.map(({ icon: Icon, color, url, name }) => (
+                <a
+                  key={name}
+                  href={url!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm text-white transition-all duration-300 hover:scale-110 hover:bg-white/30"
+                  style={{ color: "white" }}
+                >
+                  <Icon size={20} />
+                </a>
+              ))
+            ) : (
+              <div className="flex items-center justify-center h-12 text-white/80 text-sm italic">
+                Coming soon...
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

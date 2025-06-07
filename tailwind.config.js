@@ -14,7 +14,6 @@ module.exports = {
           beige: "#F5E9DC",
           highlight: "#E35BA5",
         },
-        // Add some gray variations for consistency
         gray: {
           50: "#f9fafb",
           100: "#f3f4f6",
@@ -31,13 +30,44 @@ module.exports = {
       fontFamily: {
         "work-sans": ["var(--font-work-sans)", "sans-serif"],
         inter: ["var(--font-inter)", "sans-serif"],
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"], // Makes Inter the default
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       fontSize: {
         hero: "clamp(3.5rem, 10vw, 5rem)",
         nav: "clamp(2.5rem, 8vw, 3.5rem)",
         "section-title": "clamp(2.5rem, 6vw, 3.5rem)",
+        display: "clamp(2rem, 5vw, 2.75rem)", // NEW: For refined section headers
+        headline: "clamp(1.5rem, 3vw, 2rem)", // NEW: For subsection titles
         large: "1.375rem", // 22px
+        body: "1rem", // NEW: Standard body text
+        caption: "0.875rem", // NEW: Small descriptive text
+      },
+      fontWeight: {
+        // Add more nuanced weights
+        light: "300",
+        normal: "400",
+        medium: "500",
+        semibold: "600",
+        bold: "700",
+        extrabold: "800",
+      },
+      letterSpacing: {
+        // Add more refined tracking options
+        tighter: "-0.05em",
+        tight: "-0.025em",
+        normal: "0em",
+        wide: "0.025em",
+        wider: "0.05em",
+        widest: "0.1em",
+        "extra-wide": "0.15em", // NEW: For spaced-out headings
+      },
+      lineHeight: {
+        // Add more specific line heights
+        tight: "1.1",
+        snug: "1.3",
+        normal: "1.5",
+        relaxed: "1.6",
+        loose: "1.8",
       },
       spacing: {
         18: "4.5rem",
@@ -51,6 +81,9 @@ module.exports = {
         card: "0 10px 25px rgba(0, 0, 0, 0.1)",
         "card-hover": "0 20px 40px rgba(0, 0, 0, 0.15)",
         engeloop: "0 4px 12px rgba(192, 78, 39, 0.3)",
+        // NEW: Subtle text shadows for overlays
+        "text-light": "0 1px 3px rgba(0, 0, 0, 0.3)",
+        "text-strong": "0 2px 6px rgba(0, 0, 0, 0.5)",
       },
       backdropBlur: {
         xs: "2px",
@@ -87,5 +120,61 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Custom typography component classes
+    function ({ addComponents, theme }) {
+      addComponents({
+        // Hero Typography
+        ".text-hero-primary": {
+          fontFamily: theme("fontFamily.work-sans"),
+          fontSize: theme("fontSize.hero"),
+          fontWeight: theme("fontWeight.semibold"), // Lighter than bold
+          letterSpacing: theme("letterSpacing.wide"),
+          lineHeight: theme("lineHeight.tight"),
+          textTransform: "uppercase",
+        },
+        ".text-hero-subtitle": {
+          fontFamily: theme("fontFamily.inter"),
+          fontSize: theme("fontSize.xl"),
+          fontWeight: theme("fontWeight.normal"), // Much lighter
+          letterSpacing: theme("letterSpacing.normal"),
+          lineHeight: theme("lineHeight.relaxed"),
+        },
+
+        // Section Headers (for footer, etc.)
+        ".text-section-refined": {
+          fontFamily: theme("fontFamily.work-sans"),
+          fontSize: theme("fontSize.display"),
+          fontWeight: theme("fontWeight.medium"), // Much lighter than bold
+          letterSpacing: theme("letterSpacing.wider"),
+          lineHeight: theme("lineHeight.snug"),
+          textTransform: "uppercase",
+        },
+
+        // Body Text Variants
+        ".text-body-refined": {
+          fontFamily: theme("fontFamily.inter"),
+          fontSize: theme("fontSize.large"),
+          fontWeight: theme("fontWeight.normal"),
+          letterSpacing: theme("letterSpacing.normal"),
+          lineHeight: theme("lineHeight.relaxed"),
+        },
+        ".text-caption-refined": {
+          fontFamily: theme("fontFamily.inter"),
+          fontSize: theme("fontSize.caption"),
+          fontWeight: theme("fontWeight.normal"),
+          letterSpacing: theme("letterSpacing.wide"),
+          lineHeight: theme("lineHeight.normal"),
+        },
+
+        // Text Shadow Utilities
+        ".text-shadow-hero": {
+          textShadow: "0 2px 8px rgba(0, 0, 0, 0.4)",
+        },
+        ".text-shadow-subtle": {
+          textShadow: "0 1px 3px rgba(0, 0, 0, 0.3)",
+        },
+      });
+    },
+  ],
 };

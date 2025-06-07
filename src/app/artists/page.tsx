@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import ArtistCard from "@/app/components/ArtistCard";
 import StandardHero from "@/app/components/StandardHero";
+import StandardFooter from "@/app/components/StandardFooter";
 import ErrorDisplay, {
   LoadingState,
   EmptyState,
@@ -35,18 +36,14 @@ export default function ArtistsPage() {
           const response = await fetch("/api/artists");
 
           if (!response.ok) {
-            // This will throw and be caught by the error handler
             throw new Error(`HTTP ${response.status}: Failed to fetch artists`);
           }
 
-          // The API now returns { success: true, data: [...] }
           const apiResponse = await response.json();
 
-          // FIX: Check for success and access the nested 'data' property
           if (apiResponse.success) {
-            return apiResponse.data; // Return the actual array of artists
+            return apiResponse.data;
           } else {
-            // If success is false, throw an error with the message from the API
             throw new Error(apiResponse.error || "API returned an error");
           }
         },
@@ -56,7 +53,6 @@ export default function ArtistsPage() {
       if (result.error) {
         setError(result.error);
       } else {
-        // result.data is now the array of artists
         setArtists(result.data || []);
       }
 
@@ -65,8 +61,6 @@ export default function ArtistsPage() {
 
     fetchArtists();
   }, []);
-
-  // ... (The rest of the component JSX remains entirely the same)
 
   if (loading) {
     return (
@@ -137,41 +131,52 @@ export default function ArtistsPage() {
       <StandardHero
         title="OUR ARTISTS"
         subtitle="Discover the talented artists who shape the sound of Engeloop Records"
-        backgroundImage="/media/atabaque.jpg"
+        backgroundImage="/media/BringMeLove.jpg"
         backgroundPosition="50% 25%"
         textColor="light"
       />
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 justify-items-center px-4 sm:px-6">
-            {artists.map((artist) => (
-              <ArtistCard key={artist.id} artist={artist} />
-            ))}
+
+      {/* Pure Artist Mosaic - No Container */}
+      <div
+        className="overflow-x-auto scrollbar-hide"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        <div className="flex flex-col" style={{ width: "max-content" }}>
+          <div className="flex">
+            {artists
+              .filter((_, index) => index % 2 === 0)
+              .map((artist) => (
+                <ArtistCard key={artist.id} artist={artist} />
+              ))}
           </div>
-          <div className="text-center mt-12 text-gray-600">
-            <p className="text-sm">
-              Showing {artists.length} artist{artists.length !== 1 ? "s" : ""}
-            </p>
+          <div className="flex">
+            {artists
+              .filter((_, index) => index % 2 === 1)
+              .map((artist) => (
+                <ArtistCard key={artist.id} artist={artist} />
+              ))}
           </div>
         </div>
-      </section>
-      <section className="py-24 bg-gray-50 text-center">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-4xl font-bold text-gray-900 uppercase tracking-wider mb-6">
-            Join Our Roster
-          </h2>
-          <p className="text-xl text-gray-600 leading-relaxed mb-12 max-w-2xl mx-auto">
-            Got something special? We're always looking for the next standout
-            sound in Afro House or Deep House.
-          </p>
-          <a
-            href="/submit"
-            className="inline-block bg-engeloop-orange text-white px-10 py-4 rounded-xl font-semibold text-lg uppercase tracking-wider no-underline transition-all duration-300 hover:bg-orange-700 hover:-translate-y-1 hover:shadow-lg"
-          >
-            Submit Your Music
-          </a>
-        </div>
-      </section>
+      </div>
+
+      <StandardFooter
+        title="Join Our Roster"
+        description="Got something special? We're always looking for the next standout sound in Afro House or Deep House."
+        buttonText="Submit Your Music"
+        buttonHref="/submit"
+        backgroundColor="cream"
+        theme="light"
+      />
+
+      <style jsx>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }

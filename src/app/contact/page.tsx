@@ -1,5 +1,7 @@
 import Link from "next/link";
 import StandardHero from "@/app/components/StandardHero"; // Import StandardHero
+import StandardFooter from "@/app/components/StandardFooter"; // Import StandardFooter
+import { Button } from "../components/ui/Button";
 import { Mail, MessageSquare, MapPin, Clock } from "lucide-react"; // Optional: for icons
 
 export default function ContactPage() {
@@ -108,6 +110,14 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+      <StandardFooter
+        title="Submit Your Demo"
+        description="Ready to share your music? Use our streamlined submission process to get your tracks reviewed by our team."
+        buttonText="Submit Demo"
+        buttonHref="/submit"
+        backgroundColor="cream"
+        buttonVariant="secondary"
+      />
     </div>
   );
 }

@@ -10,7 +10,7 @@ const navLinks = [
   { href: "/about", label: "About" },
   { href: "/artists", label: "Artists" },
   { href: "/releases", label: "Releases" },
-  { href: "/playlists", label: "Playlistçs" },
+  { href: "/playlists", label: "Playlists" },
   { href: "/contact", label: "Contact" },
 ]; // Home link is usually implicit with the logo
 

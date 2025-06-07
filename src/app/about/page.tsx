@@ -1,5 +1,6 @@
 // src/app/about/page.tsx
 
+import Image from "next/image";
 import StandardHero from "@/app/components/StandardHero";
 import StandardFooter from "@/app/components/StandardFooter";
 import {
@@ -10,17 +11,19 @@ import {
   Music,
   Globe,
   Users,
+  Palette,
 } from "lucide-react";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen">
-      {/* Enhanced Hero Section */}
+    <div className="bg-white">
+      {" "}
+      {/* Set a base background color */}
+      {/* ===== 1. Hero Section (Consistent with other pages) ===== */}
       <StandardHero
         title="Curating electronic music that moves both body and soul"
         subtitle="Independent. Afro House. Built on relationships."
-        description="Based in Sliema, Malta, we're a boutique record label dedicated to discovering exceptional talent and building lasting partnerships with artists who share our passion."
-        backgroundImage="/media/BringMeLove.jpg" // Using your updated hero image
+        backgroundImage="/media/BringMeLove.jpg"
         backgroundPosition="50% 25%"
         textColor="light"
         titleStyle="refined"
@@ -29,16 +32,17 @@ export default function AboutPage() {
         ctaHref="/artists"
         ctaVariant="primary"
       />
-
-      {/* Story Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-            <div>
-              <h2 className="text-section-refined text-gray-900 mb-6">
-                Our Story
-              </h2>
-              <div className="space-y-4">
+      {/* ===== 2. Our Story (Asymmetrical Layout) ===== */}
+      {/* This section mimics the 'About The Echoes' layout from your example */}
+      <section className="bg-white py-24 sm:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-16 sm:gap-y-24 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+            {/* Left Column: Text */}
+            <div className="lg:pr-4">
+              <div className="text-base leading-7 text-gray-700 lg:max-w-lg">
+                <h2 className="text-section-refined text-engeloop-charcoal mb-6">
+                  Our Story
+                </h2>
                 <p className="text-body-refined text-gray-600">
                   Engeloop Records was born from a deep passion for the rhythmic
                   heartbeat of Afro House and the soulful depths of Deep House.
@@ -46,7 +50,7 @@ export default function AboutPage() {
                   our reputation on discovering exceptional talent and providing
                   artists with the platform they deserve.
                 </p>
-                <p className="text-body-refined text-gray-600">
+                <p className="mt-8 text-body-refined text-gray-600">
                   Our mission goes beyond just releasing music—we're committed
                   to building long-term relationships with our artists, helping
                   them develop their unique sound, and connecting them with
@@ -55,210 +59,143 @@ export default function AboutPage() {
                 </p>
               </div>
             </div>
-            <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-engeloop-orange to-engeloop-highlight rounded-2xl p-8 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <Music className="w-16 h-16 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Since 2020</h3>
-                  <p className="text-white/90">
-                    Curating exceptional electronic music
-                  </p>
-                </div>
-              </div>
+            {/* Right Column: Image */}
+            <div className="relative w-full h-64 sm:h-96 lg:h-full lg:min-h-[32rem] rounded-2xl overflow-hidden shadow-lg">
+              <Image
+                src="/media/wena.jpg" // Suggestion: Use an atmospheric "in the studio" or "at a console" shot here
+                alt="Engeloop Records studio session"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
             </div>
           </div>
         </div>
       </section>
-
-      {/* What We Offer Section */}
-      <section className="py-20 bg-gray-50/50">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-section-refined text-gray-900 mb-4">
-              What We Offer
-            </h2>
-            <p className="text-body-refined text-gray-600 max-w-2xl mx-auto">
+      {/* ===== 3. What We Offer (Dark, Themed Section) ===== */}
+      {/* Adopting the dark background from your example for a change of pace */}
+      <section className="bg-engeloop-charcoal py-24 sm:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl lg:text-center">
+            <h2 className="text-section-refined text-white">What We Offer</h2>
+            <p className="mt-6 text-lg leading-8 text-gray-300">
               Comprehensive support designed to elevate your music and career
             </p>
           </div>
-
-          {/* Grid of 4 Cards */}
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Playlist Promotion */}
-            <div className="group bg-gradient-to-br from-engeloop-orange/5 to-engeloop-orange/10 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-engeloop-orange/10">
-              <div className="flex items-start space-x-4">
-                <div className="w-16 h-16 bg-engeloop-orange rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <Music className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    Playlist Promotion
-                  </h3>
-                  <p className="text-caption-refined text-gray-600 leading-relaxed">
+          <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+            <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
+              {/* Feature Item */}
+              <div className="flex flex-col">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+                  <div className="h-12 w-12 rounded-lg bg-engeloop-orange/20 flex items-center justify-center">
+                    <Music className="h-6 w-6 text-engeloop-orange" />
+                  </div>
+                  Playlist Promotion
+                </dt>
+                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
+                  <p className="flex-auto">
                     Placements on our curated playlists, with 113K+ active
                     followers and growing reach across multiple platforms.
                   </p>
-                </div>
+                </dd>
               </div>
-            </div>
-
-            {/* Artwork & Visual Identity */}
-            <div className="group bg-gradient-to-br from-engeloop-highlight/5 to-engeloop-highlight/10 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-engeloop-highlight/10">
-              <div className="flex items-start space-x-4">
-                <div className="w-16 h-16 bg-engeloop-highlight rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <svg
-                    className="w-8 h-8 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7 13.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM12 9c.83 0 1.5-.67 1.5-1.5S12.83 6 12 6s-1.5.67-1.5 1.5S11.17 9 12 9zm5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    Artwork & Visual Identity
-                  </h3>
-                  <p className="text-caption-refined text-gray-600 leading-relaxed">
-                    We believe strong visual style adds consistency and meaning
-                    across our releases. Our in-house visual team creates
-                    connected, recognizable, and well-curated artwork.
+              {/* Feature Item */}
+              <div className="flex flex-col">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+                  <div className="h-12 w-12 rounded-lg bg-engeloop-highlight/20 flex items-center justify-center">
+                    <Palette className="h-6 w-6 text-engeloop-highlight" />
+                  </div>
+                  Artwork & Visual Identity
+                </dt>
+                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
+                  <p className="flex-auto">
+                    We believe strong visual style adds consistency. Our
+                    in-house visual team creates connected and recognizable
+                    artwork.
                   </p>
-                </div>
+                </dd>
               </div>
-            </div>
-
-            {/* Release Management */}
-            <div className="group bg-gradient-to-br from-engeloop-charcoal/5 to-engeloop-charcoal/10 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-engeloop-charcoal/10">
-              <div className="flex items-start space-x-4">
-                <div className="w-16 h-16 bg-engeloop-charcoal rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <Globe className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    Release Management
-                  </h3>
-                  <p className="text-caption-refined text-gray-600 leading-relaxed">
+              {/* Add the other two features here following the same pattern */}
+              <div className="flex flex-col">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+                  <div className="h-12 w-12 rounded-lg bg-white/10 flex items-center justify-center">
+                    <Globe className="h-6 w-6 text-white/80" />
+                  </div>
+                  Release Management
+                </dt>
+                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
+                  <p className="flex-auto">
                     We handle scheduling, distribution, and delivery, so you can
-                    focus on the music. Hands-on support from first demo to
-                    post-release promotion.
+                    focus on the music. Hands-on support from demo to release.
                   </p>
-                </div>
+                </dd>
+              </div>
+              <div className="flex flex-col">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
+                  <div className="h-12 w-12 rounded-lg bg-engeloop-cream/20 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-engeloop-cream" />
+                  </div>
+                  Ongoing Support
+                </dt>
+                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
+                  <p className="flex-auto">
+                    We stay involved long-term, not just for one track. We build
+                    lasting partnerships that evolve with your artistic journey.
+                  </p>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
+      {/* ===== 4. Get In Touch (Cream/Beige background) ===== */}
+      <section className="bg-engeloop-cream/30 py-24 sm:py-32">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-section-refined text-engeloop-charcoal mb-4">
+            Get In Touch
+          </h2>
+          <p className="text-body-refined text-gray-600 max-w-2xl mx-auto">
+            Ready to start your journey with us? We'd love to hear from you.
+          </p>
+        </div>
+        {/* Contact details can remain similar, just styled on the new background */}
+        <div className="max-w-4xl mx-auto px-6 mt-16">
+          <div className="grid md:grid-cols-2 gap-x-8 gap-y-10">
+            {/* General Inquiries */}
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-engeloop-orange/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Mail className="w-6 h-6 text-engeloop-orange" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">
+                  General Inquiries
+                </h3>
+                <a
+                  href="mailto:info@engelooprecords.com"
+                  className="text-engeloop-orange hover:underline text-sm"
+                >
+                  info@engelooprecords.com
+                </a>
               </div>
             </div>
-
-            {/* Ongoing Support */}
-            <div className="group bg-gradient-to-br from-engeloop-cream/30 to-engeloop-beige/30 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-engeloop-cream/20">
-              <div className="flex items-start space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-engeloop-orange to-engeloop-highlight rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <Users className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    Ongoing Support
-                  </h3>
-                  <p className="text-caption-refined text-gray-600 leading-relaxed">
-                    We stay involved long-term — not just for one track, but for
-                    your growth. Building lasting partnerships that evolve with
-                    your artistic journey.
-                  </p>
-                </div>
+            {/* Other contact items... */}
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-engeloop-charcoal/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-6 h-6 text-engeloop-charcoal" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Location</h3>
+                <p className="text-caption-refined text-gray-600">
+                  Waterpoint Apartments, A6102
+                  <br />
+                  SLM 1020, Sliema, Malta
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* Contact Information Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-section-refined text-gray-900 mb-4">
-              Get In Touch
-            </h2>
-            <p className="text-body-refined text-gray-600 max-w-2xl mx-auto">
-              Ready to start your journey with us? We'd love to hear from you.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Contact Cards */}
-            <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-engeloop-orange/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-6 h-6 text-engeloop-orange" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">
-                    General Inquiries
-                  </h3>
-                  <p className="text-caption-refined text-gray-600 mb-1">
-                    <a
-                      href="mailto:info@engelooprecords.com"
-                      className="text-engeloop-orange hover:underline"
-                    >
-                      info@engelooprecords.com
-                    </a>
-                  </p>
-                  <p className="text-caption-refined text-gray-500">
-                    Response time: 24-48 hours
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-engeloop-highlight/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <MessageSquare className="w-6 h-6 text-engeloop-highlight" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">
-                    Demo Submissions
-                  </h3>
-                  <p className="text-caption-refined text-gray-600 mb-1">
-                    Use our streamlined submission form
-                  </p>
-                  <p className="text-caption-refined text-gray-500">
-                    Response time: 7-14 business days
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-engeloop-charcoal/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-6 h-6 text-engeloop-charcoal" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Location</h3>
-                  <p className="text-caption-refined text-gray-600">
-                    Waterpoint Apartments, A6102
-                    <br />
-                    SLM 1020, Sliema, Malta
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-engeloop-cream/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-6 h-6 text-engeloop-orange" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">
-                    Business Hours
-                  </h3>
-                  <p className="text-caption-refined text-gray-600">
-                    Monday - Friday: 9:00 AM - 6:00 PM CET
-                    <br />
-                    Weekend: By appointment only
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action Footer */}
+      {/* ===== 5. Final CTA Footer (Consistent) ===== */}
       <StandardFooter
         title="Ready to Work With Us?"
         description="Get in touch to discuss your project, learn about our services, or explore collaboration opportunities with Engeloop Records."

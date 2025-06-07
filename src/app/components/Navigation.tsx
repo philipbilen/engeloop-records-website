@@ -4,19 +4,20 @@ import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const navLinks = [
-  { href: "/about", label: "About" },
   { href: "/artists", label: "Artists" },
   { href: "/releases", label: "Releases" },
   { href: "/playlists", label: "Playlists" },
+  { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ]; // Home link is usually implicit with the logo
 
 const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter(); // Initialize router
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -64,6 +65,14 @@ const Navigation = () => {
   const inactiveLinkPillClasses =
     "text-gray-300 hover:text-white hover:bg-white/10";
 
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/") {
+      e.preventDefault(); // Prevent default link behavior
+      window.location.reload(); // Force a reload to reset the page state
+    }
+    // If not on the homepage, let the Link component handle navigation normally
+  };
+
   return (
     <>
       {/* Desktop Navigation Pill */}
@@ -74,6 +83,7 @@ const Navigation = () => {
             href="/"
             className="flex-shrink-0"
             aria-label="Engeloop Records Home"
+            onClick={handleLogoClick} // <<< --- ADD THIS LINE
           >
             <Image
               src="/media/engeloop-logo.png"

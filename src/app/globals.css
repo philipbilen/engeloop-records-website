@@ -202,14 +202,8 @@ h3 {
 }
 
 /* Homepage specific overrides */
-body:has(.homepage-container) {
+body.no-scroll {
   overflow: hidden;
-  height: 100vh;
-}
-
-html:has(.homepage-container) {
-  overflow: hidden;
-  height: 100vh;
 }
 
 /* Responsive Typography */
